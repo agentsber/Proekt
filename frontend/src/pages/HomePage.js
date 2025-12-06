@@ -139,8 +139,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="glass-panel rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-[#00ff9d]/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <TrendingUp className="w-8 h-8 text-[#00ff9d]" />
+              <div className="w-16 h-16 bg-primary-10 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <TrendingUp className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ fontFamily: 'Unbounded' }}>
                 Лучшие цены
@@ -149,22 +149,22 @@ export default function HomePage() {
                 Конкурентные цены на все товары
               </p>
             </div>
-            <Link to="/giveaways" className="glass-panel rounded-xl p-8 text-center hover:border-[#00ff9d] transition-all group">
-              <div className="w-16 h-16 bg-[#00ff9d]/10 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-[#00ff9d] transition-colors">
-                <Gift className="w-8 h-8 text-[#00ff9d] group-hover:text-black" />
+            <Link to="/giveaways" className="glass-panel rounded-xl p-8 text-center transition-all group" style={{ borderColor: 'transparent' }}>
+              <div className="w-16 h-16 bg-primary-10 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-primary transition-colors">
+                <Gift className="w-8 h-8 text-primary group-hover:text-black" />
               </div>
-              <h3 className="text-xl font-bold mb-2 group-hover:text-[#00ff9d]" style={{ fontFamily: 'Unbounded' }}>
+              <h3 className="text-xl font-bold mb-2 group-hover:text-primary" style={{ fontFamily: 'Unbounded' }}>
                 Раздачи
               </h3>
               <p className="text-[#8b949e]">
                 Участвуйте в розыгрышах призов
               </p>
             </Link>
-            <Link to="/blog" className="glass-panel rounded-xl p-8 text-center hover:border-[#00ff9d] transition-all group">
-              <div className="w-16 h-16 bg-[#00ff9d]/10 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-[#00ff9d] transition-colors">
-                <BookOpen className="w-8 h-8 text-[#00ff9d] group-hover:text-black" />
+            <Link to="/blog" className="glass-panel rounded-xl p-8 text-center transition-all group" style={{ borderColor: 'transparent' }}>
+              <div className="w-16 h-16 bg-primary-10 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-primary transition-colors">
+                <BookOpen className="w-8 h-8 text-primary group-hover:text-black" />
               </div>
-              <h3 className="text-xl font-bold mb-2 group-hover:text-[#00ff9d]" style={{ fontFamily: 'Unbounded' }}>
+              <h3 className="text-xl font-bold mb-2 group-hover:text-primary" style={{ fontFamily: 'Unbounded' }}>
                 Блог
               </h3>
               <p className="text-[#8b949e]">
