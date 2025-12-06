@@ -175,6 +175,87 @@ export const Layout = ({ children }) => {
         {children}
       </main>
 
+      {/* Search Modal */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-20"
+          onClick={handleSearchClose}
+        >
+          <div
+            className="w-full max-w-2xl mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Input */}
+            <div className="glass-panel rounded-xl p-4 mb-4">
+              <div className="flex items-center space-x-3">
+                <Search className="w-5 h-5 text-[#8b949e]" />
+                <input
+                  type="text"
+                  placeholder="Поиск товаров..."
+                  className="flex-1 bg-transparent border-none outline-none text-lg"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  data-testid="search-input"
+                />
+                {searchLoading && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
+                <button
+                  onClick={handleSearchClose}
+                  className="p-2 hover:bg-[#161b22] rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Search Results */}
+            {searchQuery.length >= 2 && (
+              <div className="glass-panel rounded-xl max-h-[60vh] overflow-y-auto">
+                {searchLoading ? (
+                  <div className="p-8 text-center text-[#8b949e]">
+                    <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
+                    Поиск...
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <div className="divide-y divide-[#30363d]">
+                    {searchResults.map((product) => (
+                      <button
+                        key={product.id}
+                        onClick={() => handleProductClick(product.id)}
+                        className="w-full p-4 hover:bg-[#161b22] transition-colors text-left flex items-center space-x-4"
+                        data-testid={`search-result-${product.id}`}
+                      >
+                        <img
+                          src={product.images[0] || 'https://images.unsplash.com/photo-1605433887450-490fcd8c0c17?crop=entropy&cs=srgb&fm=jpg&q=85'}
+                          alt={product.title}
+                          className="w-16 h-16 rounded-lg object-cover"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-1">{product.title}</h3>
+                          <p className="text-sm text-[#8b949e] line-clamp-1">{product.description}</p>
+                        </div>
+                        <div className="text-primary font-bold">${product.price}</div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-[#8b949e]" data-testid="no-results">
+                    Ничего не найдено
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Search Hint */}
+            {searchQuery.length < 2 && (
+              <div className="text-center text-[#8b949e] text-sm mt-4">
+                Введите минимум 2 символа для поиска
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="bg-[#0d1117] border-t border-[#30363d] mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
