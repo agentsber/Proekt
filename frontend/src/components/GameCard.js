@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye } from 'lucide-react';
+import { CurrencyContext } from '@/App';
+import { formatPrice } from '@/utils/currency';
 
 export const GameCard = ({ product, onFavorite }) => {
-  const formatPrice = (price, currency) => {
-    const symbols = { usd: '$', eur: '€', rub: '₽' };
-    return `${symbols[currency] || '$'}${price.toFixed(2)}`;
-  };
+  const { currency } = useContext(CurrencyContext);
 
   return (
     <Link
