@@ -335,7 +335,11 @@ async def get_products(
     if category:
         query["category_id"] = category
     if search:
-        query["title"] = {"$regex": search, "$options": "i"}
+        # Search in both title and description
+        query["$or"] = [
+            {"title": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}}
+        ]
     
     products = await db.products.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
     for p in products:
