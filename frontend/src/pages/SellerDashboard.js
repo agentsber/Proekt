@@ -69,11 +69,42 @@ export default function SellerDashboard() {
     setLoading(true);
 
     try {
+      let imageUrls = [];
+      
+      // Upload new images if any
+      if (imageFiles.length > 0) {
+        setUploadingImages(true);
+        const formDataUpload = new FormData();
+        imageFiles.forEach(file => {
+          formDataUpload.append('files', file);
+        });
+        
+        const uploadResponse = await axios.post(`${API}/upload/images`, formDataUpload, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        imageUrls = uploadResponse.data.urls;
+        setUploadingImages(false);
+      }
+      
+      // If editing and no new images, keep existing ones
+      if (editingProduct && imageUrls.length === 0) {
+        imageUrls = formData.images.split(',').map(url => url.trim()).filter(url => url);
+      }
+      
+      // If no uploaded images, try to use URLs from text input
+      if (imageUrls.length === 0 && formData.images) {
+        imageUrls = formData.images.split(',').map(url => url.trim()).filter(url => url);
+      }
+
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
-        images: formData.images.split(',').map(url => url.trim()).filter(url => url)
+        images: imageUrls
       };
 
       if (editingProduct) {
@@ -96,6 +127,7 @@ export default function SellerDashboard() {
       toast.error('Ошибка: ' + (error.response?.data?.detail || 'Не удалось сохранить товар'));
     } finally {
       setLoading(false);
+      setUploadingImages(false);
     }
   };
 
