@@ -106,6 +106,15 @@ export const Layout = ({ children }) => {
                 </SelectContent>
               </Select>
 
+              {/* Search Button */}
+              <button
+                onClick={handleSearchOpen}
+                className="p-2 hover:bg-[#161b22] rounded-lg transition-colors"
+                data-testid="search-button"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
               {/* Cart */}
               <button
                 onClick={() => navigate('/cart')}
