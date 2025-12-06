@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Layout } from '@/components/Layout';
 import { GameCard } from '@/components/GameCard';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, TrendingUp, Gift, BookOpen } from 'lucide-react';
-import { API } from '@/App';
+import { ArrowRight, TrendingUp, Gift, BookOpen, Eye } from 'lucide-react';
+import { API, AuthContext } from '@/App';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
+  const { user, token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [viewedProducts, setViewedProducts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
