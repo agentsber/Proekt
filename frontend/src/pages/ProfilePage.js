@@ -9,24 +9,14 @@ import { GameCard } from '@/components/GameCard';
 
 export default function ProfilePage() {
   const { user, token } = useContext(AuthContext);
-  const { fetchFavorites: refreshFavorites } = useContext(FavoritesContext);
   const [orders, setOrders] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favoritesProducts, setFavoritesProducts] = useState([]);
   const [viewed, setViewed] = useState([]);
 
   useEffect(() => {
     fetchOrders();
     fetchFavorites();
     fetchViewed();
-  }, []);
-
-  // Re-fetch favorites when component mounts or favorites change in context
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchFavorites();
-    }, 2000); // Refresh every 2 seconds when on favorites tab
-    
-    return () => clearInterval(interval);
   }, []);
 
   const fetchOrders = async () => {
@@ -45,7 +35,7 @@ export default function ProfilePage() {
       const response = await axios.get(`${API}/favorites/my`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setFavorites(response.data);
+      setFavoritesProducts(response.data);
     } catch (error) {
       console.error('Failed to fetch favorites:', error);
     }
