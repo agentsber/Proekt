@@ -145,13 +145,13 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="favorites">
-            {favorites.length === 0 ? (
+            {favoritesProducts.length === 0 ? (
               <div className="text-center py-12 text-[#8b949e]" data-testid="no-favorites">
                 У вас пока нет избранных товаров
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {favorites.map(product => (
+                {favoritesProducts.map(product => (
                   <GameCard key={product.id} product={product} />
                 ))}
               </div>
