@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AuthContext, CartContext, CurrencyContext, API } from '@/App';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { formatPrice } from '@/utils/currency';
 
 export default function CheckoutPage() {
   const { user, token } = useContext(AuthContext);
