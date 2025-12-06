@@ -32,12 +32,20 @@ export const CartContext = React.createContext(null);
 // Currency Context
 export const CurrencyContext = React.createContext(null);
 
+// Site Settings Context
+export const SiteSettingsContext = React.createContext(null);
+
 function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [cart, setCart] = useState([]);
   const [currency, setCurrency] = useState('usd');
   const [loading, setLoading] = useState(true);
+  const [siteSettings, setSiteSettings] = useState({
+    primary_color: '#00ff9d',
+    accent_color: '#00cc7d',
+    site_name: 'GameHub'
+  });
 
   useEffect(() => {
     if (token) {
