@@ -79,7 +79,7 @@ export default function ProductPage() {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-[#00ff9d] text-xl">Загрузка...</div>
+          <div className="text-primary text-xl">Загрузка...</div>
         </div>
       </Layout>
     );
@@ -101,7 +101,7 @@ export default function ProductPage() {
 
           {/* Info */}
           <div>
-            <div className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-3 py-1 text-sm font-semibold text-[#00ff9d] mb-4">
+            <div className="inline-flex items-center rounded-full border border-primary bg-primary-10 px-3 py-1 text-sm font-semibold text-primary mb-4">
               {product.product_type}
             </div>
             <h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'Unbounded' }} data-testid="product-title">
@@ -125,7 +125,7 @@ export default function ProductPage() {
             <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[#8b949e]">Цена:</span>
-                <span className="text-4xl font-bold text-[#00ff9d]" data-testid="product-price">
+                <span className="text-4xl font-bold text-primary" data-testid="product-price">
                   {formatPrice(product.price, currency)}
                 </span>
               </div>
@@ -133,7 +133,7 @@ export default function ProductPage() {
               <div className="flex space-x-3">
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-1 skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black font-bold py-6"
+                  className="flex-1 skew-button bg-primary hover:bg-primary-hover text-black font-bold py-6"
                   data-testid="add-to-cart-button"
                 >
                   <span className="flex items-center justify-center">
@@ -155,7 +155,7 @@ export default function ProductPage() {
             {product.seller_id && (
               <button
                 onClick={() => navigate(`/seller/${product.seller_id}`)}
-                className="text-[#00ff9d] hover:text-[#00cc7d] text-sm"
+                className="text-primary hover:text-primary-hover text-sm"
                 data-testid="view-seller-button"
               >
                 Посмотреть продавца →

@@ -84,7 +84,7 @@ export default function CheckoutPage() {
                         <p className="text-sm text-[#8b949e]">Количество: {item.quantity}</p>
                       </div>
                     </div>
-                    <span className="font-bold text-[#00ff9d]">{formatPrice(item.price * item.quantity, currency)}</span>
+                    <span className="font-bold text-primary">{formatPrice(item.price * item.quantity, currency)}</span>
                   </div>
                 ))}
               </div>
@@ -120,13 +120,13 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-xl font-bold pt-3 border-t border-[#30363d]">
                   <span>К оплате:</span>
-                  <span className="text-[#00ff9d]" data-testid="checkout-total">{formatPrice(total, currency)}</span>
+                  <span className="text-primary" data-testid="checkout-total">{formatPrice(total, currency)}</span>
                 </div>
               </div>
               <Button
                 onClick={handleCheckout}
                 disabled={loading}
-                className="w-full skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black font-bold py-6"
+                className="w-full skew-button bg-primary hover:bg-primary-hover text-black font-bold py-6"
                 data-testid="payment-button"
               >
                 {loading ? (
