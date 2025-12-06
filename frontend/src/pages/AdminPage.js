@@ -1049,6 +1049,124 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Navigation Links */}
+                <div className="border-t border-[#30363d] pt-6">
+                  <h3 className="text-lg font-semibold mb-4">Навигация в футере</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Navigation Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold">Навигация</Label>
+                        <button
+                          type="button"
+                          onClick={() => addNavigationLink('footer_navigation')}
+                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                        >
+                          + Добавить
+                        </button>
+                      </div>
+                      {settingsForm.footer_navigation.map((link, index) => (
+                        <div key={index} className="space-y-2 p-3 bg-[#0d1117] rounded-lg border border-[#30363d]">
+                          <Input
+                            placeholder="Название"
+                            value={link.title}
+                            onChange={(e) => updateNavigationLink('footer_navigation', index, 'title', e.target.value)}
+                            className="text-sm"
+                          />
+                          <Input
+                            placeholder="URL"
+                            value={link.url}
+                            onChange={(e) => updateNavigationLink('footer_navigation', index, 'url', e.target.value)}
+                            className="text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeNavigationLink('footer_navigation', index)}
+                            className="text-xs text-red-500 hover:text-red-400"
+                          >
+                            Удалить
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Support Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold">Поддержка</Label>
+                        <button
+                          type="button"
+                          onClick={() => addNavigationLink('footer_support')}
+                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                        >
+                          + Добавить
+                        </button>
+                      </div>
+                      {settingsForm.footer_support.map((link, index) => (
+                        <div key={index} className="space-y-2 p-3 bg-[#0d1117] rounded-lg border border-[#30363d]">
+                          <Input
+                            placeholder="Название"
+                            value={link.title}
+                            onChange={(e) => updateNavigationLink('footer_support', index, 'title', e.target.value)}
+                            className="text-sm"
+                          />
+                          <Input
+                            placeholder="URL"
+                            value={link.url}
+                            onChange={(e) => updateNavigationLink('footer_support', index, 'url', e.target.value)}
+                            className="text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeNavigationLink('footer_support', index)}
+                            className="text-xs text-red-500 hover:text-red-400"
+                          >
+                            Удалить
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Legal Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold">Юридическое</Label>
+                        <button
+                          type="button"
+                          onClick={() => addNavigationLink('footer_legal')}
+                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                        >
+                          + Добавить
+                        </button>
+                      </div>
+                      {settingsForm.footer_legal.map((link, index) => (
+                        <div key={index} className="space-y-2 p-3 bg-[#0d1117] rounded-lg border border-[#30363d]">
+                          <Input
+                            placeholder="Название"
+                            value={link.title}
+                            onChange={(e) => updateNavigationLink('footer_legal', index, 'title', e.target.value)}
+                            className="text-sm"
+                          />
+                          <Input
+                            placeholder="URL"
+                            value={link.url}
+                            onChange={(e) => updateNavigationLink('footer_legal', index, 'url', e.target.value)}
+                            className="text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeNavigationLink('footer_legal', index)}
+                            className="text-xs text-red-500 hover:text-red-400"
+                          >
+                            Удалить
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Preview */}
                 <div className="border-t border-[#30363d] pt-6">
                   <h3 className="text-lg font-semibold mb-4">Предпросмотр</h3>
