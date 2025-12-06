@@ -8,6 +8,7 @@ import { formatPrice } from '@/utils/currency';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateCartQuantity } = useContext(CartContext);
+  const { currency } = useContext(CurrencyContext);
   const navigate = useNavigate();
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
