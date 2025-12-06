@@ -269,9 +269,8 @@ async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_cu
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Get backend URL from environment
-        backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
-        image_url = f"{backend_url}/uploads/{unique_filename}"
+        # Return relative URL path (will be accessible via /uploads/...)
+        image_url = f"/uploads/{unique_filename}"
         
         return {"url": image_url, "filename": unique_filename}
     except Exception as e:
