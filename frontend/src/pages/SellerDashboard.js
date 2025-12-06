@@ -31,6 +31,10 @@ export default function SellerDashboard() {
     stock: '10'
   });
 
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreview, setImagePreview] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+
   useEffect(() => {
     if (!user || user.role === 'buyer') {
       navigate('/auth');
