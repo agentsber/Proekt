@@ -232,6 +232,10 @@ export default function ProfilePage() {
               <Package className="w-4 h-4 mr-2" />
               Заказы
             </TabsTrigger>
+            <TabsTrigger value="transactions" data-testid="transactions-tab">
+              <History className="w-4 h-4 mr-2" />
+              Транзакции
+            </TabsTrigger>
             <TabsTrigger value="favorites" data-testid="favorites-tab">
               <Heart className="w-4 h-4 mr-2" />
               Избранное
