@@ -90,6 +90,8 @@ export default function AdminPage() {
     fetchOrders();
     fetchCategories();
     fetchSettings();
+    fetchTransactions();
+    fetchGiveaways();
   };
 
   const fetchStats = async () => {
