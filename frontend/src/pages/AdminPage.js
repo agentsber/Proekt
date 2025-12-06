@@ -281,7 +281,17 @@ export default function AdminPage() {
       await axios.put(`${API}/admin/settings`, settingsForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Настройки сохранены! Обновите страницу для применения изменений.');
+      
+      // Apply settings immediately
+      document.documentElement.style.setProperty('--primary-color', settingsForm.primary_color);
+      document.documentElement.style.setProperty('--accent-color', settingsForm.accent_color);
+      
+      // Refresh site settings in context
+      if (fetchSiteSettings) {
+        await fetchSiteSettings();
+      }
+      
+      toast.success('Настройки сохранены и применены!');
     } catch (error) {
       toast.error('Ошибка сохранения настроек');
     }
