@@ -295,15 +295,50 @@ export default function SellerDashboard() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="images">URL изображений (через запятую)</Label>
-                  <Input
-                    id="images"
-                    value={formData.images}
-                    onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                    data-testid="product-images-input"
-                  />
-                  <p className="text-xs text-[#8b949e] mt-1">Или используйте: https://images.unsplash.com/photo-1605433887450-490fcd8c0c17?crop=entropy&cs=srgb&fm=jpg&q=85</p>
+                  <Label htmlFor="images">Изображения товара</Label>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <Input
+                        id="images"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageSelect}
+                        className="flex-1"
+                        data-testid="product-images-file-input"
+                      />
+                      <span className="text-xs text-[#8b949e]">или</span>
+                    </div>
+                    <Input
+                      value={formData.images}
+                      onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+                      placeholder="URL изображений через запятую"
+                      data-testid="product-images-url-input"
+                    />
+                    
+                    {imagePreview.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        {imagePreview.map((preview, index) => (
+                          <div key={index} className="relative group">
+                            <img 
+                              src={preview} 
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-[#30363d]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImagePreview(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-end space-x-3 pt-4">
                   <Button
