@@ -41,6 +41,18 @@ export default function HomePage() {
     }
   };
 
+  const fetchViewedProducts = async () => {
+    if (!token) return;
+    try {
+      const response = await axios.get(`${API}/viewed/my`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setViewedProducts(response.data.slice(0, 4)); // Show only last 4
+    } catch (error) {
+      console.error('Failed to fetch viewed products:', error);
+    }
+  };
+
   return (
     <Layout>
       {/* Hero Section */}
