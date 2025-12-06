@@ -88,7 +88,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="orders" className="w-full">
+        <Tabs defaultValue="orders" className="w-full" onValueChange={(value) => {
+          if (value === 'favorites') {
+            fetchFavorites();
+          } else if (value === 'viewed') {
+            fetchViewed();
+          }
+        }}>
           <TabsList className="mb-8">
             <TabsTrigger value="orders" data-testid="orders-tab">
               <Package className="w-4 h-4 mr-2" />
