@@ -13,6 +13,7 @@ export default function ProductPage() {
   const { id } = useParams();
   const { user, token } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
+  const { currency } = useContext(CurrencyContext);
   const [product, setProduct] = useState(null);
   const [similar, setSimilar] = useState([]);
   const navigate = useNavigate();
