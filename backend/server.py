@@ -303,6 +303,39 @@ async def create_product(data: ProductCreate, user: dict = Depends(require_selle
     product_doc["created_at"] = datetime.fromisoformat(product_doc["created_at"])
     return Product(**product_doc)
 
+@api_router.put("/products/{product_id}", response_model=Product)
+async def update_product(product_id: str, data: ProductCreate, user: dict = Depends(require_seller)):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Check if user owns this product or is admin
+    if product["seller_id"] != user["id"] and user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to edit this product")
+    
+    update_data = data.model_dump()
+    await db.products.update_one(
+        {"id": product_id},
+        {"$set": update_data}
+    )
+    
+    updated_product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    updated_product["created_at"] = datetime.fromisoformat(updated_product["created_at"])
+    return Product(**updated_product)
+
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str, user: dict = Depends(require_seller)):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Check if user owns this product or is admin
+    if product["seller_id"] != user["id"] and user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this product")
+    
+    await db.products.delete_one({"id": product_id})
+    return {"message": "Product deleted successfully"}
+
 @api_router.get("/products/{product_id}/similar", response_model=List[Product])
 async def get_similar_products(product_id: str, limit: int = 4):
     product = await db.products.find_one({"id": product_id}, {"_id": 0})
