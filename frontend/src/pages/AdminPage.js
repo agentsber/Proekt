@@ -606,43 +606,44 @@ export default function AdminPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Тип товара</Label>
-                        <Select value={productForm.product_type} onValueChange={(val) => setProductForm({ ...productForm, product_type: val })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="key">Ключ активации</SelectItem>
-                            <SelectItem value="item">Внутриигровой предмет</SelectItem>
-                            <SelectItem value="account">Аккаунт</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <select
+                          value={productForm.product_type}
+                          onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}
+                          className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-white"
+                        >
+                          <option value="key">Ключ активации</option>
+                          <option value="item">Внутриигровой предмет</option>
+                          <option value="account">Аккаунт</option>
+                        </select>
                       </div>
                       <div>
                         <Label>Категория</Label>
-                        <Select value={productForm.category_id} onValueChange={(val) => setProductForm({ ...productForm, category_id: val })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Выберите категорию" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map(cat => (
-                              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <select
+                          value={productForm.category_id}
+                          onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })}
+                          className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-white"
+                          required
+                        >
+                          <option value="">Выберите категорию</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     <div>
                       <Label>Продавец (ID)</Label>
-                      <Select value={productForm.seller_id} onValueChange={(val) => setProductForm({ ...productForm, seller_id: val })}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Выберите продавца" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.filter(u => u.role === 'seller' || u.role === 'admin').map(user => (
-                            <SelectItem key={user.id} value={user.id}>{user.full_name} ({user.email})</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <select
+                        value={productForm.seller_id}
+                        onChange={(e) => setProductForm({ ...productForm, seller_id: e.target.value })}
+                        className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-white"
+                        required
+                      >
+                        <option value="">Выберите продавца</option>
+                        {users.filter(u => u.role === 'seller' || u.role === 'admin').map(user => (
+                          <option key={user.id} value={user.id}>{user.full_name} ({user.email})</option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <Label>URL изображений (через запятую)</Label>
