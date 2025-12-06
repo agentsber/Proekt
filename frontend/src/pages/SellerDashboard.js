@@ -206,7 +206,7 @@ export default function SellerDashboard() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black" data-testid="add-product-button">
+              <Button className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="add-product-button">
                 <span className="flex items-center">
                   <Plus className="w-5 h-5 mr-2" />
                   Добавить товар
@@ -356,7 +356,7 @@ export default function SellerDashboard() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="bg-[#00ff9d] hover:bg-[#00cc7d] text-black"
+                    className="bg-primary hover:bg-primary-hover text-black"
                     data-testid="submit-product-button"
                   >
                     {loading ? 'Сохранение...' : editingProduct ? 'Обновить' : 'Добавить'}
@@ -372,28 +372,28 @@ export default function SellerDashboard() {
           <div className="glass-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#8b949e]">Товаров</span>
-              <Package className="w-5 h-5 text-[#00ff9d]" />
+              <Package className="w-5 h-5 text-primary" />
             </div>
             <p className="text-3xl font-bold" data-testid="total-products">{products.length}</p>
           </div>
           <div className="glass-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#8b949e]">Продаж</span>
-              <DollarSign className="w-5 h-5 text-[#00ff9d]" />
+              <DollarSign className="w-5 h-5 text-primary" />
             </div>
             <p className="text-3xl font-bold" data-testid="total-sales">{totalSales}</p>
           </div>
           <div className="glass-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#8b949e]">Доход</span>
-              <DollarSign className="w-5 h-5 text-[#00ff9d]" />
+              <DollarSign className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-3xl font-bold text-[#00ff9d]" data-testid="total-revenue">${totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-primary" data-testid="total-revenue">${totalRevenue.toFixed(2)}</p>
           </div>
           <div className="glass-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#8b949e]">Просмотры</span>
-              <Eye className="w-5 h-5 text-[#00ff9d]" />
+              <Eye className="w-5 h-5 text-primary" />
             </div>
             <p className="text-3xl font-bold" data-testid="total-views">{totalViews}</p>
           </div>
@@ -431,13 +431,13 @@ export default function SellerDashboard() {
                         />
                         <div>
                           <p className="font-semibold">{product.title}</p>
-                          <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-2 py-0.5 text-xs font-semibold text-[#00ff9d]">
+                          <span className="inline-flex items-center rounded-full border border-primary bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                             {product.product_type}
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-[#00ff9d] font-bold">${product.price}</td>
+                    <td className="px-6 py-4 text-primary font-bold">${product.price}</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.stock}</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.sales_count}</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.views_count}</td>
