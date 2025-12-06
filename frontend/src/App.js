@@ -13,6 +13,7 @@ import CheckoutPage from '@/pages/CheckoutPage';
 import AuthPage from '@/pages/AuthPage';
 import ProfilePage from '@/pages/ProfilePage';
 import SellerPage from '@/pages/SellerPage';
+import SellerDashboard from '@/pages/SellerDashboard';
 import GiveawaysPage from '@/pages/GiveawaysPage';
 import BlogPage from '@/pages/BlogPage';
 import BlogPostPage from '@/pages/BlogPostPage';
@@ -127,6 +128,7 @@ function App() {
                 <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
                 <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/profile" />} />
                 <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" />} />
+                <Route path="/seller-dashboard" element={user && user.role !== 'buyer' ? <SellerDashboard /> : <Navigate to="/auth" />} />
                 <Route path="/seller/:id" element={<SellerPage />} />
                 <Route path="/giveaways" element={<GiveawaysPage />} />
                 <Route path="/blog" element={<BlogPage />} />
