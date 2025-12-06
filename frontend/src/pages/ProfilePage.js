@@ -179,6 +179,46 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Balance Card */}
+        <div className="glass-panel rounded-xl p-8 mb-8" data-testid="balance-card">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center bg-primary-10">
+                <Wallet className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-[#8b949e] mb-1">Баланс</p>
+                <h2 className="text-4xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="balance-amount">
+                  ${balance.toFixed(2)}
+                </h2>
+              </div>
+            </div>
+            <div className="flex space-x-3">
+              <Button
+                onClick={() => setDepositModalOpen(true)}
+                className="skew-button bg-primary hover:bg-primary-hover text-black"
+                data-testid="deposit-button"
+              >
+                <span className="flex items-center">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Пополнить
+                </span>
+              </Button>
+              <Button
+                onClick={() => setWithdrawModalOpen(true)}
+                variant="outline"
+                className="skew-button border-primary hover:bg-primary-10"
+                data-testid="withdraw-button"
+              >
+                <span className="flex items-center">
+                  <Minus className="w-5 h-5 mr-2" />
+                  Вывести
+                </span>
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Tabs */}
         <Tabs defaultValue="orders" className="w-full" onValueChange={(value) => {
           if (value === 'favorites') {
