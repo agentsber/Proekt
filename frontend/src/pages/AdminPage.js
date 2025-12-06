@@ -372,9 +372,17 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Apply settings immediately
-      document.documentElement.style.setProperty('--primary-color', settingsForm.primary_color);
-      document.documentElement.style.setProperty('--accent-color', settingsForm.accent_color);
+      // Apply all CSS variables immediately
+      const root = document.documentElement;
+      root.style.setProperty('--site-primary', settingsForm.primary_color);
+      root.style.setProperty('--site-primary-hover', settingsForm.accent_color);
+      root.style.setProperty('--site-accent', settingsForm.accent_color);
+      root.style.setProperty('--site-background', settingsForm.background_color);
+      root.style.setProperty('--site-text', settingsForm.text_color);
+      
+      // Legacy support
+      root.style.setProperty('--primary-color', settingsForm.primary_color);
+      root.style.setProperty('--accent-color', settingsForm.accent_color);
       
       // Refresh site settings in context
       if (fetchSiteSettings) {
