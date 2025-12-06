@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Trash2, Plus, Minus } from 'lucide-react';
-import { CartContext } from '@/App';
+import { CartContext, CurrencyContext } from '@/App';
+import { formatPrice } from '@/utils/currency';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateCartQuantity } = useContext(CartContext);
