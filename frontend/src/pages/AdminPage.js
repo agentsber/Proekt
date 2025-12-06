@@ -21,6 +21,8 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [categories, setCategories] = useState([]);
   const [siteSettings, setSiteSettings] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [giveaways, setGiveaways] = useState([]);
   
   // Dialogs
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
