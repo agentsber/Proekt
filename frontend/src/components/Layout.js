@@ -10,6 +10,7 @@ export const Layout = ({ children }) => {
   const { user, logout } = useContext(AuthContext);
   const { cart } = useContext(CartContext);
   const { currency, setCurrency } = useContext(CurrencyContext);
+  const { siteSettings } = useContext(SiteSettingsContext);
   const navigate = useNavigate();
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
