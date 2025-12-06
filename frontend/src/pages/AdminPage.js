@@ -640,6 +640,8 @@ export default function AdminPage() {
                     <th className="px-6 py-3 text-left text-sm font-semibold">Имя</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Email</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Роль</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Баланс</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -648,12 +650,126 @@ export default function AdminPage() {
                       <td className="px-6 py-4">{user.full_name}</td>
                       <td className="px-6 py-4 text-[#8b949e]">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                          {user.role}
-                        </span>
+                        <Select 
+                          value={user.role} 
+                          onValueChange={(value) => handleUpdateUserRole(user.id, value)}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="buyer">buyer</SelectItem>
+                            <SelectItem value="seller">seller</SelectItem>
+                            <SelectItem value="admin">admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-primary">
+                        ${user.balance?.toFixed(2) || '0.00'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAdjustBalance(user.id)}
+                            className="text-xs"
+                          >
+                            <DollarSign className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-xs text-red-500 hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
+
+          {/* Transactions Tab */}
+          <TabsContent value="transactions">
+            <div className="glass-panel rounded-xl overflow-hidden">
+              <table className="w-full" data-testid="transactions-table">
+                <thead className="bg-[#0d1117]">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">ID</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Пользователь</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Тип</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Сумма</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Статус</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Дата</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map(transaction => {
+                    const user = users.find(u => u.id === transaction.user_id);
+                    return (
+                      <tr key={transaction.id} className="border-t border-[#30363d]">
+                        <td className="px-6 py-4 text-xs text-[#8b949e]">
+                          {transaction.id.slice(0, 8)}...
+                        </td>
+                        <td className="px-6 py-4">{user?.email || 'Unknown'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
+                            transaction.type === 'deposit' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                          }`}>
+                            {transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-semibold">${transaction.amount.toFixed(2)}</td>
+                        <td className="px-6 py-4">
+                          <Select 
+                            value={transaction.status} 
+                            onValueChange={(value) => handleUpdateTransactionStatus(transaction.id, value)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">pending</SelectItem>
+                              <SelectItem value="completed">completed</SelectItem>
+                              <SelectItem value="failed">failed</SelectItem>
+                              <SelectItem value="cancelled">cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#8b949e]">
+                          {new Date(transaction.created_at).toLocaleString('ru-RU')}
+                        </td>
+                        <td className="px-6 py-4">
+                          {transaction.status === 'pending' && (
+                            <div className="flex space-x-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleUpdateTransactionStatus(transaction.id, 'completed')}
+                                className="text-xs text-green-500"
+                              >
+                                <CheckCircle className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleUpdateTransactionStatus(transaction.id, 'cancelled')}
+                                className="text-xs text-red-500"
+                              >
+                                <XCircle className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
