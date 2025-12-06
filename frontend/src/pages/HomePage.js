@@ -151,6 +151,31 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Recently Viewed */}
+      {user && viewedProducts.length > 0 && (
+        <section className="py-16 bg-[#0d1117]/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center">
+                <Eye className="w-8 h-8 text-primary mr-3" />
+                <h2 className="text-3xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="viewed-products-heading">
+                  Недавно просмотренные
+                </h2>
+              </div>
+              <Link to="/profile" className="text-primary hover:text-primary-hover flex items-center" data-testid="view-all-viewed-link">
+                Смотреть все
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {viewedProducts.map(product => (
+                <GameCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Features */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
