@@ -48,12 +48,26 @@ function App() {
   });
 
   useEffect(() => {
+    fetchSiteSettings();
     if (token) {
       fetchUser();
     } else {
       setLoading(false);
     }
   }, [token]);
+
+  const fetchSiteSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings/public`);
+      setSiteSettings(response.data);
+      
+      // Apply CSS variables
+      document.documentElement.style.setProperty('--primary-color', response.data.primary_color);
+      document.documentElement.style.setProperty('--accent-color', response.data.accent_color);
+    } catch (error) {
+      console.error('Failed to fetch site settings:', error);
+    }
+  };
 
   const fetchUser = async () => {
     try {
