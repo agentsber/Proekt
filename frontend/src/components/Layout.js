@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Settings, Search, Menu } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Settings, Search, Menu, X, Loader2 } from 'lucide-react';
 import { AuthContext, CartContext, CurrencyContext, SiteSettingsContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import axios from 'axios';
+import { API } from '@/App';
 
 export const Layout = ({ children }) => {
   const { user, logout } = useContext(AuthContext);
@@ -14,6 +16,12 @@ export const Layout = ({ children }) => {
   const navigate = useNavigate();
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  
+  // Search state
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   return (
     <div className="min-h-screen">
