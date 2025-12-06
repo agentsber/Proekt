@@ -874,7 +874,20 @@ async def get_public_settings():
             "background_color": "#02040a",
             "text_color": "#ffffff",
             "site_name": "GameHub",
-            "site_description": "Маркетплейс игровых товаров"
+            "site_description": "Маркетплейс игровых товаров",
+            "footer_navigation": [
+                {"title": "Каталог", "url": "/catalog"},
+                {"title": "Раздачи", "url": "/giveaways"},
+                {"title": "Блог", "url": "/blog"}
+            ],
+            "footer_support": [
+                {"title": "FAQ", "url": "#"},
+                {"title": "Контакты", "url": "#"}
+            ],
+            "footer_legal": [
+                {"title": "Условия использования", "url": "#"},
+                {"title": "Политика конфиденциальности", "url": "#"}
+            ]
         }
     return settings
 
