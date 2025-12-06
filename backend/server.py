@@ -1,15 +1,18 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import bcrypt
+import jwt
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,52 +22,715 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# JWT Config
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM', 'HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+# Stripe Config
+stripe_api_key = os.environ['STRIPE_API_KEY']
+
+# Security
+security = HTTPBearer()
+
 # Create the main app without a prefix
 app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# === Auth Models ===
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    role: str = "buyer"  # buyer, seller, admin
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    email: str
+    full_name: str
+    role: str
+    avatar: Optional[str] = None
+    balance: float = 0.0
+    created_at: datetime
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: User
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+# === Product Models ===
+class ProductCreate(BaseModel):
+    title: str
+    description: str
+    price: float
+    product_type: str  # key, item, account
+    images: List[str]
+    category_id: str
+    stock: int = 1
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+class Product(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    description: str
+    price: float
+    product_type: str
+    images: List[str]
+    category_id: str
+    seller_id: str
+    stock: int
+    sales_count: int = 0
+    views_count: int = 0
+    created_at: datetime
+
+# === Category Models ===
+class CategoryCreate(BaseModel):
+    name: str
+    slug: str
+    parent_id: Optional[str] = None
+    description: Optional[str] = None
+    image: Optional[str] = None
+
+class Category(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    slug: str
+    parent_id: Optional[str] = None
+    level: int = 0
+    description: Optional[str] = None
+    image: Optional[str] = None
+
+# === Order Models ===
+class OrderItem(BaseModel):
+    product_id: str
+    title: str
+    price: float
+    quantity: int
+
+class OrderCreate(BaseModel):
+    items: List[OrderItem]
+    currency: str = "usd"
+
+class Order(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    items: List[OrderItem]
+    total: float
+    currency: str
+    status: str  # pending, paid, completed, cancelled
+    payment_id: Optional[str] = None
+    created_at: datetime
+
+# === Payment Models ===
+class PaymentCheckoutRequest(BaseModel):
+    order_id: str
+
+# === Blog Models ===
+class BlogPostCreate(BaseModel):
+    title: str
+    slug: str
+    content: str
+    image: Optional[str] = None
+
+class BlogPost(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    slug: str
+    content: str
+    author_id: str
+    image: Optional[str] = None
+    published_at: datetime
+
+# === Giveaway Models ===
+class GiveawayCreate(BaseModel):
+    title: str
+    description: str
+    products: List[str]
+    end_date: datetime
+
+class Giveaway(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    title: str
+    description: str
+    products: List[str]
+    entries: List[str] = []
+    winner_id: Optional[str] = None
+    end_date: datetime
+    status: str = "active"  # active, ended
+
+# === Admin Models ===
+class AdminStats(BaseModel):
+    total_users: int
+    total_products: int
+    total_orders: int
+    total_revenue: float
+
+# === Helper Functions ===
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def require_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+async def require_seller(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") not in ["seller", "admin"]:
+        raise HTTPException(status_code=403, detail="Seller access required")
+    return user
+
+# === Auth Routes ===
+@api_router.post("/auth/register", response_model=TokenResponse)
+async def register(data: UserRegister):
+    existing = await db.users.find_one({"email": data.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    user_id = str(uuid.uuid4())
+    user_doc = {
+        "id": user_id,
+        "email": data.email,
+        "password_hash": hash_password(data.password),
+        "full_name": data.full_name,
+        "role": data.role,
+        "avatar": None,
+        "balance": 0.0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
     
-    return status_checks
+    user_doc.pop("password_hash")
+    user_doc["created_at"] = datetime.fromisoformat(user_doc["created_at"])
+    
+    access_token = create_access_token({"sub": user_id})
+    return TokenResponse(access_token=access_token, user=User(**user_doc))
+
+@api_router.post("/auth/login", response_model=TokenResponse)
+async def login(data: UserLogin):
+    user = await db.users.find_one({"email": data.email}, {"_id": 0})
+    if not user or not verify_password(data.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    user.pop("password_hash")
+    user["created_at"] = datetime.fromisoformat(user["created_at"])
+    
+    access_token = create_access_token({"sub": user["id"]})
+    return TokenResponse(access_token=access_token, user=User(**user))
+
+@api_router.get("/auth/me", response_model=User)
+async def get_me(user: dict = Depends(get_current_user)):
+    user["created_at"] = datetime.fromisoformat(user["created_at"])
+    return User(**user)
+
+# === Product Routes ===
+@api_router.get("/products", response_model=List[Product])
+async def get_products(
+    category: Optional[str] = None,
+    search: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 20
+):
+    query = {}
+    if category:
+        query["category_id"] = category
+    if search:
+        query["title"] = {"$regex": search, "$options": "i"}
+    
+    products = await db.products.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    for p in products:
+        p["created_at"] = datetime.fromisoformat(p["created_at"])
+    return products
+
+@api_router.get("/products/{product_id}", response_model=Product)
+async def get_product(product_id: str):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    product["created_at"] = datetime.fromisoformat(product["created_at"])
+    
+    # Increment views
+    await db.products.update_one({"id": product_id}, {"$inc": {"views_count": 1}})
+    return Product(**product)
+
+@api_router.post("/products", response_model=Product)
+async def create_product(data: ProductCreate, user: dict = Depends(require_seller)):
+    product_id = str(uuid.uuid4())
+    product_doc = {
+        "id": product_id,
+        **data.model_dump(),
+        "seller_id": user["id"],
+        "sales_count": 0,
+        "views_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.products.insert_one(product_doc)
+    product_doc["created_at"] = datetime.fromisoformat(product_doc["created_at"])
+    return Product(**product_doc)
+
+@api_router.get("/products/{product_id}/similar", response_model=List[Product])
+async def get_similar_products(product_id: str, limit: int = 4):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    similar = await db.products.find(
+        {"category_id": product["category_id"], "id": {"$ne": product_id}},
+        {"_id": 0}
+    ).limit(limit).to_list(limit)
+    
+    for p in similar:
+        p["created_at"] = datetime.fromisoformat(p["created_at"])
+    return similar
+
+# === Category Routes ===
+@api_router.get("/categories", response_model=List[Category])
+async def get_categories():
+    categories = await db.categories.find({}, {"_id": 0}).to_list(1000)
+    return categories
+
+@api_router.post("/categories", response_model=Category)
+async def create_category(data: CategoryCreate, user: dict = Depends(require_admin)):
+    cat_id = str(uuid.uuid4())
+    level = 0
+    if data.parent_id:
+        parent = await db.categories.find_one({"id": data.parent_id}, {"_id": 0})
+        if parent:
+            level = parent.get("level", 0) + 1
+    
+    cat_doc = {"id": cat_id, **data.model_dump(), "level": level}
+    await db.categories.insert_one(cat_doc)
+    return Category(**cat_doc)
+
+# === Order Routes ===
+@api_router.post("/orders", response_model=Order)
+async def create_order(data: OrderCreate, user: dict = Depends(get_current_user)):
+    order_id = str(uuid.uuid4())
+    total = sum(item.price * item.quantity for item in data.items)
+    
+    order_doc = {
+        "id": order_id,
+        "user_id": user["id"],
+        "items": [item.model_dump() for item in data.items],
+        "total": total,
+        "currency": data.currency,
+        "status": "pending",
+        "payment_id": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.orders.insert_one(order_doc)
+    order_doc["created_at"] = datetime.fromisoformat(order_doc["created_at"])
+    return Order(**order_doc)
+
+@api_router.get("/orders/my", response_model=List[Order])
+async def get_my_orders(user: dict = Depends(get_current_user)):
+    orders = await db.orders.find({"user_id": user["id"]}, {"_id": 0}).to_list(1000)
+    for o in orders:
+        o["created_at"] = datetime.fromisoformat(o["created_at"])
+    return orders
+
+@api_router.get("/orders/{order_id}", response_model=Order)
+async def get_order(order_id: str, user: dict = Depends(get_current_user)):
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order["user_id"] != user["id"] and user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+    order["created_at"] = datetime.fromisoformat(order["created_at"])
+    return Order(**order)
+
+# === Payment Routes (Stripe) ===
+@api_router.post("/payments/checkout/session")
+async def create_checkout_session(data: PaymentCheckoutRequest, request: Request, user: dict = Depends(get_current_user)):
+    order = await db.orders.find_one({"id": data.order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order["user_id"] != user["id"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get host from frontend
+    host_url = str(request.base_url).rstrip('/')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    
+    stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+    
+    success_url = f"{host_url}/checkout/success?session_id={{{{CHECKOUT_SESSION_ID}}}}"
+    cancel_url = f"{host_url}/checkout/cancel"
+    
+    checkout_request = CheckoutSessionRequest(
+        amount=order["total"],
+        currency=order["currency"],
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={"order_id": order["id"], "user_id": user["id"]}
+    )
+    
+    session = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    # Create payment transaction
+    transaction_doc = {
+        "id": str(uuid.uuid4()),
+        "session_id": session.session_id,
+        "order_id": order["id"],
+        "user_id": user["id"],
+        "amount": order["total"],
+        "currency": order["currency"],
+        "payment_status": "pending",
+        "status": "initiated",
+        "metadata": {"order_id": order["id"], "user_id": user["id"]},
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.payment_transactions.insert_one(transaction_doc)
+    
+    return {"url": session.url, "session_id": session.session_id}
+
+@api_router.get("/payments/checkout/status/{session_id}")
+async def get_checkout_status(session_id: str, user: dict = Depends(get_current_user)):
+    transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    host_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+    
+    checkout_status = await stripe_checkout.get_checkout_status(session_id)
+    
+    # Update transaction if payment successful and not already processed
+    if checkout_status.payment_status == "paid" and transaction["payment_status"] != "paid":
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"payment_status": "paid", "status": "completed"}}
+        )
+        
+        # Update order status
+        await db.orders.update_one(
+            {"id": transaction["order_id"]},
+            {"$set": {"status": "paid", "payment_id": session_id}}
+        )
+        
+        # Update product sales count
+        order = await db.orders.find_one({"id": transaction["order_id"]}, {"_id": 0})
+        if order:
+            for item in order["items"]:
+                await db.products.update_one(
+                    {"id": item["product_id"]},
+                    {"$inc": {"sales_count": item["quantity"], "stock": -item["quantity"]}}
+                )
+    
+    return {
+        "status": checkout_status.status,
+        "payment_status": checkout_status.payment_status,
+        "amount_total": checkout_status.amount_total,
+        "currency": checkout_status.currency
+    }
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    body = await request.body()
+    signature = request.headers.get("Stripe-Signature")
+    
+    host_url = str(request.base_url).rstrip('/')
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+    
+    try:
+        event = await stripe_checkout.handle_webhook(body, signature)
+        
+        if event.payment_status == "paid":
+            transaction = await db.payment_transactions.find_one({"session_id": event.session_id}, {"_id": 0})
+            if transaction and transaction["payment_status"] != "paid":
+                await db.payment_transactions.update_one(
+                    {"session_id": event.session_id},
+                    {"$set": {"payment_status": "paid", "status": "completed"}}
+                )
+                
+                await db.orders.update_one(
+                    {"id": transaction["order_id"]},
+                    {"$set": {"status": "paid", "payment_id": event.session_id}}
+                )
+        
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+# === Favorites Routes ===
+@api_router.post("/favorites")
+async def add_favorite(product_id: str, user: dict = Depends(get_current_user)):
+    existing = await db.favorites.find_one({"user_id": user["id"], "product_id": product_id})
+    if existing:
+        return {"message": "Already in favorites"}
+    
+    fav_doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "product_id": product_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.favorites.insert_one(fav_doc)
+    return {"message": "Added to favorites"}
+
+@api_router.delete("/favorites/{product_id}")
+async def remove_favorite(product_id: str, user: dict = Depends(get_current_user)):
+    await db.favorites.delete_one({"user_id": user["id"], "product_id": product_id})
+    return {"message": "Removed from favorites"}
+
+@api_router.get("/favorites/my", response_model=List[Product])
+async def get_my_favorites(user: dict = Depends(get_current_user)):
+    favorites = await db.favorites.find({"user_id": user["id"]}, {"_id": 0}).to_list(1000)
+    product_ids = [f["product_id"] for f in favorites]
+    
+    products = await db.products.find({"id": {"$in": product_ids}}, {"_id": 0}).to_list(1000)
+    for p in products:
+        p["created_at"] = datetime.fromisoformat(p["created_at"])
+    return products
+
+# === Viewed Products ===
+@api_router.post("/viewed/{product_id}")
+async def add_viewed(product_id: str, user: dict = Depends(get_current_user)):
+    viewed_doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "product_id": product_id,
+        "viewed_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.viewed_products.insert_one(viewed_doc)
+    return {"message": "Added to viewed"}
+
+@api_router.get("/viewed/my", response_model=List[Product])
+async def get_my_viewed(user: dict = Depends(get_current_user), limit: int = 10):
+    viewed = await db.viewed_products.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("viewed_at", -1).limit(limit).to_list(limit)
+    
+    product_ids = [v["product_id"] for v in viewed]
+    products = await db.products.find({"id": {"$in": product_ids}}, {"_id": 0}).to_list(1000)
+    for p in products:
+        p["created_at"] = datetime.fromisoformat(p["created_at"])
+    return products
+
+# === Blog Routes ===
+@api_router.get("/blog", response_model=List[BlogPost])
+async def get_blog_posts(skip: int = 0, limit: int = 10):
+    posts = await db.blog_posts.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    for p in posts:
+        p["published_at"] = datetime.fromisoformat(p["published_at"])
+    return posts
+
+@api_router.get("/blog/{slug}", response_model=BlogPost)
+async def get_blog_post(slug: str):
+    post = await db.blog_posts.find_one({"slug": slug}, {"_id": 0})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    post["published_at"] = datetime.fromisoformat(post["published_at"])
+    return BlogPost(**post)
+
+@api_router.post("/blog", response_model=BlogPost)
+async def create_blog_post(data: BlogPostCreate, user: dict = Depends(require_admin)):
+    post_id = str(uuid.uuid4())
+    post_doc = {
+        "id": post_id,
+        **data.model_dump(),
+        "author_id": user["id"],
+        "published_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.blog_posts.insert_one(post_doc)
+    post_doc["published_at"] = datetime.fromisoformat(post_doc["published_at"])
+    return BlogPost(**post_doc)
+
+# === Giveaway Routes ===
+@api_router.get("/giveaways", response_model=List[Giveaway])
+async def get_giveaways():
+    giveaways = await db.giveaways.find({}, {"_id": 0}).to_list(1000)
+    for g in giveaways:
+        g["end_date"] = datetime.fromisoformat(g["end_date"])
+    return giveaways
+
+@api_router.post("/giveaways/enter/{giveaway_id}")
+async def enter_giveaway(giveaway_id: str, user: dict = Depends(get_current_user)):
+    giveaway = await db.giveaways.find_one({"id": giveaway_id}, {"_id": 0})
+    if not giveaway:
+        raise HTTPException(status_code=404, detail="Giveaway not found")
+    
+    if user["id"] in giveaway.get("entries", []):
+        return {"message": "Already entered"}
+    
+    await db.giveaways.update_one(
+        {"id": giveaway_id},
+        {"$push": {"entries": user["id"]}}
+    )
+    return {"message": "Entered giveaway"}
+
+@api_router.post("/giveaways", response_model=Giveaway)
+async def create_giveaway(data: GiveawayCreate, user: dict = Depends(require_admin)):
+    giveaway_id = str(uuid.uuid4())
+    giveaway_doc = {
+        "id": giveaway_id,
+        **data.model_dump(),
+        "end_date": data.end_date.isoformat(),
+        "entries": [],
+        "winner_id": None,
+        "status": "active"
+    }
+    await db.giveaways.insert_one(giveaway_doc)
+    giveaway_doc["end_date"] = datetime.fromisoformat(giveaway_doc["end_date"])
+    return Giveaway(**giveaway_doc)
+
+# === Seller Routes ===
+@api_router.get("/sellers/{seller_id}")
+async def get_seller(seller_id: str):
+    seller = await db.users.find_one({"id": seller_id, "role": "seller"}, {"_id": 0, "password_hash": 0})
+    if not seller:
+        raise HTTPException(status_code=404, detail="Seller not found")
+    return seller
+
+@api_router.get("/sellers/{seller_id}/products", response_model=List[Product])
+async def get_seller_products(seller_id: str, skip: int = 0, limit: int = 20):
+    products = await db.products.find(
+        {"seller_id": seller_id},
+        {"_id": 0}
+    ).skip(skip).limit(limit).to_list(limit)
+    
+    for p in products:
+        p["created_at"] = datetime.fromisoformat(p["created_at"])
+    return products
+
+# === Admin Routes ===
+@api_router.get("/admin/stats", response_model=AdminStats)
+async def get_admin_stats(user: dict = Depends(require_admin)):
+    total_users = await db.users.count_documents({})
+    total_products = await db.products.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    
+    # Calculate total revenue
+    pipeline = [
+        {"$match": {"status": "paid"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]
+    result = await db.orders.aggregate(pipeline).to_list(1)
+    total_revenue = result[0]["total"] if result else 0.0
+    
+    return AdminStats(
+        total_users=total_users,
+        total_products=total_products,
+        total_orders=total_orders,
+        total_revenue=total_revenue
+    )
+
+@api_router.get("/admin/users")
+async def get_all_users(user: dict = Depends(require_admin), skip: int = 0, limit: int = 50):
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).skip(skip).limit(limit).to_list(limit)
+    return users
+
+@api_router.get("/admin/products")
+async def get_all_products_admin(user: dict = Depends(require_admin), skip: int = 0, limit: int = 50):
+    products = await db.products.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    return products
+
+@api_router.get("/admin/orders")
+async def get_all_orders(user: dict = Depends(require_admin), skip: int = 0, limit: int = 50):
+    orders = await db.orders.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    return orders
+
+# === Chat Routes (Simple) ===
+@api_router.post("/chats")
+async def create_chat(seller_id: str, product_id: str, user: dict = Depends(get_current_user)):
+    existing = await db.chats.find_one({
+        "seller_id": seller_id,
+        "buyer_id": user["id"],
+        "product_id": product_id
+    })
+    if existing:
+        return {"chat_id": existing["id"]}
+    
+    chat_id = str(uuid.uuid4())
+    chat_doc = {
+        "id": chat_id,
+        "seller_id": seller_id,
+        "buyer_id": user["id"],
+        "product_id": product_id,
+        "messages": [],
+        "last_message_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.chats.insert_one(chat_doc)
+    return {"chat_id": chat_id}
+
+@api_router.post("/chats/{chat_id}/messages")
+async def send_message(chat_id: str, message: str, user: dict = Depends(get_current_user)):
+    chat = await db.chats.find_one({"id": chat_id}, {"_id": 0})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    if user["id"] not in [chat["seller_id"], chat["buyer_id"]]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    msg = {
+        "id": str(uuid.uuid4()),
+        "sender_id": user["id"],
+        "message": message,
+        "sent_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.chats.update_one(
+        {"id": chat_id},
+        {"$push": {"messages": msg}, "$set": {"last_message_at": msg["sent_at"]}}
+    )
+    return {"message": "Message sent"}
+
+@api_router.get("/chats/{chat_id}")
+async def get_chat(chat_id: str, user: dict = Depends(get_current_user)):
+    chat = await db.chats.find_one({"id": chat_id}, {"_id": 0})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    if user["id"] not in [chat["seller_id"], chat["buyer_id"]]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    return chat
+
+@api_router.get("/chats")
+async def get_my_chats(user: dict = Depends(get_current_user)):
+    chats = await db.chats.find(
+        {"$or": [{"seller_id": user["id"]}, {"buyer_id": user["id"]}]},
+        {"_id": 0}
+    ).to_list(1000)
+    return chats
 
 # Include the router in the main app
 app.include_router(api_router)
