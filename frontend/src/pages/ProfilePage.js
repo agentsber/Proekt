@@ -363,6 +363,109 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Deposit Modal */}
+      {depositModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setDepositModalOpen(false)}>
+          <div className="glass-panel rounded-xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Unbounded' }}>
+              Пополнение баланса
+            </h2>
+            <form onSubmit={handleDeposit} className="space-y-4">
+              <div>
+                <Label htmlFor="deposit-amount">Сумма</Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8b949e]" />
+                  <Input
+                    id="deposit-amount"
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    placeholder="0.00"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className="pl-10"
+                    required
+                    data-testid="deposit-amount-input"
+                  />
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 skew-button bg-primary hover:bg-primary-hover text-black"
+                  data-testid="deposit-submit-button"
+                >
+                  <span>{loading ? 'Обработка...' : 'Пополнить'}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDepositModalOpen(false)}
+                  className="flex-1 skew-button"
+                >
+                  <span>Отмена</span>
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Withdraw Modal */}
+      {withdrawModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setWithdrawModalOpen(false)}>
+          <div className="glass-panel rounded-xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Unbounded' }}>
+              Вывод средств
+            </h2>
+            <div className="mb-4 p-4 bg-[#161b22] rounded-lg">
+              <p className="text-sm text-[#8b949e]">Доступно для вывода:</p>
+              <p className="text-2xl font-bold text-primary">${balance.toFixed(2)}</p>
+            </div>
+            <form onSubmit={handleWithdraw} className="space-y-4">
+              <div>
+                <Label htmlFor="withdraw-amount">Сумма</Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8b949e]" />
+                  <Input
+                    id="withdraw-amount"
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    max={balance}
+                    placeholder="0.00"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    className="pl-10"
+                    required
+                    data-testid="withdraw-amount-input"
+                  />
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 skew-button bg-primary hover:bg-primary-hover text-black"
+                  data-testid="withdraw-submit-button"
+                >
+                  <span>{loading ? 'Обработка...' : 'Вывести'}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setWithdrawModalOpen(false)}
+                  className="flex-1 skew-button"
+                >
+                  <span>Отмена</span>
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
