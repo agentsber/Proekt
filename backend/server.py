@@ -981,6 +981,129 @@ async def update_site_settings(settings: SiteSettings, user: dict = Depends(requ
     await db.site_settings.update_one({}, {"$set": settings_dict}, upsert=True)
     return {"message": "Settings updated successfully", "settings": settings_dict}
 
+# === Admin User Management ===
+@api_router.put("/admin/users/{user_id}/role")
+async def update_user_role(user_id: str, role: str, admin: dict = Depends(require_admin)):
+    """Update user role"""
+    if role not in ["buyer", "seller", "admin"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    result = await db.users.update_one({"id": user_id}, {"$set": {"role": role}})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": f"User role updated to {role}"}
+
+@api_router.put("/admin/users/{user_id}/balance")
+async def adjust_user_balance(user_id: str, amount: float, admin: dict = Depends(require_admin)):
+    """Adjust user balance (add or subtract)"""
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_balance = user.get("balance", 0.0) + amount
+    if new_balance < 0:
+        raise HTTPException(status_code=400, detail="Balance cannot be negative")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"balance": new_balance}})
+    
+    # Create transaction record
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "amount": abs(amount),
+        "type": "deposit" if amount > 0 else "withdrawal",
+        "status": "completed",
+        "method": "admin_adjustment",
+        "description": f"Admin adjustment by {admin['email']}",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.transactions.insert_one(transaction)
+    
+    return {"message": "Balance adjusted", "new_balance": new_balance}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Delete user account"""
+    if user_id == admin["id"]:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted successfully"}
+
+# === Admin Transaction Management ===
+@api_router.get("/admin/transactions")
+async def get_all_transactions(admin: dict = Depends(require_admin), skip: int = 0, limit: int = 50):
+    """Get all transactions"""
+    transactions = await db.transactions.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return transactions
+
+@api_router.put("/admin/transactions/{transaction_id}/status")
+async def update_transaction_status(transaction_id: str, status: str, admin: dict = Depends(require_admin)):
+    """Update transaction status (for approving withdrawals)"""
+    if status not in ["pending", "completed", "failed", "cancelled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.transactions.update_one(
+        {"id": transaction_id},
+        {"$set": {"status": status}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    return {"message": f"Transaction status updated to {status}"}
+
+# === Admin Order Management ===
+@api_router.put("/admin/orders/{order_id}/status")
+async def update_order_status(order_id: str, status: str, admin: dict = Depends(require_admin)):
+    """Update order status"""
+    if status not in ["pending", "paid", "completed", "cancelled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {"status": status}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return {"message": f"Order status updated to {status}"}
+
+# === Admin Giveaway Management ===
+@api_router.get("/admin/giveaways")
+async def get_all_giveaways_admin(admin: dict = Depends(require_admin)):
+    """Get all giveaways for admin"""
+    giveaways = await db.giveaways.find({}, {"_id": 0}).to_list(100)
+    return giveaways
+
+@api_router.put("/admin/giveaways/{giveaway_id}")
+async def update_giveaway(giveaway_id: str, data: GiveawayCreate, admin: dict = Depends(require_admin)):
+    """Update giveaway"""
+    result = await db.giveaways.update_one(
+        {"id": giveaway_id},
+        {"$set": data.model_dump()}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Giveaway not found")
+    
+    return {"message": "Giveaway updated successfully"}
+
+@api_router.delete("/admin/giveaways/{giveaway_id}")
+async def delete_giveaway(giveaway_id: str, admin: dict = Depends(require_admin)):
+    """Delete giveaway"""
+    result = await db.giveaways.delete_one({"id": giveaway_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Giveaway not found")
+    
+    return {"message": "Giveaway deleted successfully"}
+
 @api_router.get("/settings/public")
 async def get_public_settings():
     """Public endpoint for frontend to get site settings"""
