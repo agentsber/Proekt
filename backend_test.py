@@ -319,12 +319,117 @@ class GameHubAPITester:
             )
             
             # Get seller products
-            self.run_test(
+            success, seller_products = self.run_test(
                 "Get seller products",
                 "GET",
                 f"sellers/{seller_id}/products",
                 200
             )
+            
+            # Test seller product management (NEW FUNCTIONALITY)
+            self.test_seller_product_management(seller_products)
+
+    def test_seller_product_management(self, seller_products):
+        """Test seller product CRUD operations"""
+        print("\n🛠️ Testing Seller Product Management...")
+        
+        if 'seller' not in self.tokens:
+            print("⚠️ Skipping seller product management - missing seller token")
+            return
+        
+        # Test creating a new product
+        new_product_data = {
+            "title": "Test Seller Product",
+            "description": "A test product created by seller",
+            "price": 19.99,
+            "product_type": "key",
+            "images": ["https://images.unsplash.com/photo-1605433887450-490fcd8c0c17?crop=entropy&cs=srgb&fm=jpg&q=85"],
+            "category_id": self.test_data.get('categories', [{}])[0].get('id', ''),
+            "stock": 5
+        }
+        
+        success, created_product = self.run_test(
+            "Create product (seller)",
+            "POST",
+            "products",
+            200,
+            new_product_data,
+            self.tokens['seller']
+        )
+        
+        if success and 'id' in created_product:
+            product_id = created_product['id']
+            self.test_data['seller_created_product_id'] = product_id
+            
+            # Test updating the product
+            updated_product_data = {
+                **new_product_data,
+                "title": "Updated Test Seller Product",
+                "price": 24.99,
+                "stock": 10
+            }
+            
+            self.run_test(
+                "Update own product (seller)",
+                "PUT",
+                f"products/{product_id}",
+                200,
+                updated_product_data,
+                self.tokens['seller']
+            )
+            
+            # Test that buyer cannot update seller's product
+            if 'buyer' in self.tokens:
+                self.run_test(
+                    "Update other's product (buyer - should fail)",
+                    "PUT",
+                    f"products/{product_id}",
+                    403,
+                    updated_product_data,
+                    self.tokens['buyer']
+                )
+            
+            # Test deleting the product
+            self.run_test(
+                "Delete own product (seller)",
+                "DELETE",
+                f"products/{product_id}",
+                200,
+                token=self.tokens['seller']
+            )
+            
+            # Verify product is deleted
+            self.run_test(
+                "Verify product deleted",
+                "GET",
+                f"products/{product_id}",
+                404
+            )
+        
+        # Test authorization - buyer cannot create products
+        if 'buyer' in self.tokens:
+            self.run_test(
+                "Create product (buyer - should fail)",
+                "POST",
+                "products",
+                403,
+                new_product_data,
+                self.tokens['buyer']
+            )
+        
+        # Test updating/deleting existing seller products (if any exist)
+        if seller_products and len(seller_products) > 0:
+            existing_product_id = seller_products[0]['id']
+            
+            # Test that buyer cannot delete seller's existing product
+            if 'buyer' in self.tokens:
+                self.run_test(
+                    "Delete other's product (buyer - should fail)",
+                    "DELETE",
+                    f"products/{existing_product_id}",
+                    403,
+                    token=self.tokens['buyer']
+                )
 
     def test_admin_api(self):
         """Test admin endpoints"""
