@@ -18,7 +18,10 @@ export default function HomePage() {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, []);
+    if (user && token) {
+      fetchViewedProducts();
+    }
+  }, [user, token]);
 
   const fetchProducts = async () => {
     try {
