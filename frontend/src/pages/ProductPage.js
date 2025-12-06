@@ -5,8 +5,9 @@ import { Layout } from '@/components/Layout';
 import { GameCard } from '@/components/GameCard';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Heart, Eye, Package } from 'lucide-react';
-import { AuthContext, CartContext, API } from '@/App';
+import { AuthContext, CartContext, CurrencyContext, API } from '@/App';
 import { toast } from 'sonner';
+import { formatPrice } from '@/utils/currency';
 
 export default function ProductPage() {
   const { id } = useParams();
