@@ -159,6 +159,112 @@ export default function AdminPage() {
     }
   };
 
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/transactions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
+    }
+  };
+
+  const fetchGiveaways = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/giveaways`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setGiveaways(response.data);
+    } catch (error) {
+      console.error('Failed to fetch giveaways:', error);
+    }
+  };
+
+  // User Management
+  const handleUpdateUserRole = async (userId, newRole) => {
+    try {
+      await axios.put(`${API}/admin/users/${userId}/role`, 
+        null,
+        {
+          params: { role: newRole },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      toast.success('Роль пользователя обновлена');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Ошибка обновления роли');
+    }
+  };
+
+  const handleAdjustBalance = async (userId, amount) => {
+    const adjustAmount = parseFloat(prompt(`Введите сумму (положительное для пополнения, отрицательное для списания):`));
+    if (isNaN(adjustAmount)) return;
+
+    try {
+      await axios.put(`${API}/admin/users/${userId}/balance`,
+        null,
+        {
+          params: { amount: adjustAmount },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      toast.success(`Баланс скорректирован на $${adjustAmount}`);
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ошибка корректировки баланса');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
+
+    try {
+      await axios.delete(`${API}/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Пользователь удалён');
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ошибка удаления пользователя');
+    }
+  };
+
+  // Transaction Management
+  const handleUpdateTransactionStatus = async (transactionId, newStatus) => {
+    try {
+      await axios.put(`${API}/admin/transactions/${transactionId}/status`,
+        null,
+        {
+          params: { status: newStatus },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      toast.success('Статус транзакции обновлён');
+      fetchTransactions();
+    } catch (error) {
+      toast.error('Ошибка обновления статуса');
+    }
+  };
+
+  // Order Management
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await axios.put(`${API}/admin/orders/${orderId}/status`,
+        null,
+        {
+          params: { status: newStatus },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      toast.success('Статус заказа обновлён');
+      fetchOrders();
+    } catch (error) {
+      toast.error('Ошибка обновления статуса');
+    }
+  };
+
   // Category Management
   const handleSaveCategory = async (e) => {
     e.preventDefault();
