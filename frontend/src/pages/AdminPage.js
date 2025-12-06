@@ -205,11 +205,42 @@ export default function AdminPage() {
   const handleSaveProduct = async (e) => {
     e.preventDefault();
     try {
+      let imageUrls = [];
+      
+      // Upload new images if any
+      if (imageFiles.length > 0) {
+        setUploadingImages(true);
+        const formDataUpload = new FormData();
+        imageFiles.forEach(file => {
+          formDataUpload.append('files', file);
+        });
+        
+        const uploadResponse = await axios.post(`${API}/upload/images`, formDataUpload, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        imageUrls = uploadResponse.data.urls;
+        setUploadingImages(false);
+      }
+      
+      // If editing and no new images, keep existing ones
+      if (editingProduct && imageUrls.length === 0) {
+        imageUrls = productForm.images.split(',').map(url => url.trim()).filter(url => url);
+      }
+      
+      // If no uploaded images, try to use URLs from text input
+      if (imageUrls.length === 0 && productForm.images) {
+        imageUrls = productForm.images.split(',').map(url => url.trim()).filter(url => url);
+      }
+
       const productData = {
         ...productForm,
         price: parseFloat(productForm.price),
         stock: parseInt(productForm.stock),
-        images: productForm.images.split(',').map(url => url.trim()).filter(url => url)
+        images: imageUrls
       };
 
       if (editingProduct) {
@@ -234,6 +265,8 @@ export default function AdminPage() {
       fetchProducts();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Ошибка сохранения');
+    } finally {
+      setUploadingImages(false);
     }
   };
 
