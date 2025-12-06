@@ -1131,31 +1131,102 @@ export default function AdminPage() {
                 <thead className="bg-[#0d1117]">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Заказ</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Пользователь</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Сумма</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Статус</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">Дата</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(order => (
-                    <tr key={order.id} className="border-t border-[#30363d]">
-                      <td className="px-6 py-4">#{order.id.slice(0, 8)}</td>
-                      <td className="px-6 py-4 text-primary">${order.total.toFixed(2)}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          order.status === 'paid' ? 'bg-primary/10 text-primary border border-primary' :
-                          'bg-[#8b949e]/10 text-[#8b949e] border border-[#8b949e]'
-                        }`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-[#8b949e]">
-                        {new Date(order.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
+                  {orders.map(order => {
+                    const user = users.find(u => u.id === order.user_id);
+                    return (
+                      <tr key={order.id} className="border-t border-[#30363d]">
+                        <td className="px-6 py-4">#{order.id.slice(0, 8)}</td>
+                        <td className="px-6 py-4">{user?.email || 'Unknown'}</td>
+                        <td className="px-6 py-4 font-semibold text-primary">${order.total.toFixed(2)}</td>
+                        <td className="px-6 py-4">
+                          <Select 
+                            value={order.status} 
+                            onValueChange={(value) => handleUpdateOrderStatus(order.id, value)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">pending</SelectItem>
+                              <SelectItem value="paid">paid</SelectItem>
+                              <SelectItem value="completed">completed</SelectItem>
+                              <SelectItem value="cancelled">cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#8b949e]">
+                          {new Date(order.created_at).toLocaleDateString('ru-RU')}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-xs text-[#8b949e]">
+                            {order.items?.length || 0} товаров
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+            </div>
+          </TabsContent>
+
+          {/* Giveaways Tab */}
+          <TabsContent value="giveaways">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold" style={{ fontFamily: 'Unbounded' }}>
+                Управление раздачами
+              </h2>
+              <Button className="skew-button bg-primary hover:bg-primary-hover text-black">
+                <span className="flex items-center">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Создать раздачу
+                </span>
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {giveaways.map(giveaway => (
+                <div key={giveaway.id} className="glass-panel rounded-xl p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{giveaway.title}</h3>
+                      <p className="text-sm text-[#8b949e] mb-4">{giveaway.description}</p>
+                    </div>
+                    <Gift className="w-8 h-8 text-primary" />
+                  </div>
+                  <div className="flex items-center justify-between text-sm mb-4">
+                    <span className="text-[#8b949e]">Участников:</span>
+                    <span className="font-semibold">{giveaway.entries?.length || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm mb-4">
+                    <span className="text-[#8b949e]">Окончание:</span>
+                    <span className="font-semibold">
+                      {new Date(giveaway.end_date).toLocaleDateString('ru-RU')}
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" variant="outline" className="flex-1">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Редактировать
+                    </Button>
+                    <Button size="sm" variant="outline" className="text-red-500">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {giveaways.length === 0 && (
+                <div className="col-span-2 text-center py-12 text-[#8b949e]">
+                  Нет активных раздач
+                </div>
+              )}
             </div>
           </TabsContent>
 
