@@ -169,6 +169,22 @@ export default function SellerDashboard() {
       category_id: '',
       stock: '10'
     });
+    setImageFiles([]);
+    setImagePreview([]);
+  };
+
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles(files);
+    
+    // Create preview URLs
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreview(previews);
+  };
+
+  const removeImagePreview = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreview(prev => prev.filter((_, i) => i !== index));
   };
 
   const totalSales = products.reduce((sum, p) => sum + p.sales_count, 0);
