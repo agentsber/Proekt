@@ -61,7 +61,20 @@ export default function AdminPage() {
     site_name: 'GameHub',
     site_description: 'Маркетплейс игровых товаров',
     logo_url: '',
-    hero_image: ''
+    hero_image: '',
+    footer_navigation: [
+      { title: 'Каталог', url: '/catalog' },
+      { title: 'Раздачи', url: '/giveaways' },
+      { title: 'Блог', url: '/blog' }
+    ],
+    footer_support: [
+      { title: 'FAQ', url: '#' },
+      { title: 'Контакты', url: '#' }
+    ],
+    footer_legal: [
+      { title: 'Условия использования', url: '#' },
+      { title: 'Политика конфиденциальности', url: '#' }
+    ]
   });
 
   useEffect(() => {
