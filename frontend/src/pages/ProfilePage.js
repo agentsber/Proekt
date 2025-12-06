@@ -29,6 +29,8 @@ export default function ProfilePage() {
     fetchOrders();
     fetchFavorites();
     fetchViewed();
+    fetchBalance();
+    fetchTransactions();
   }, []);
 
   const fetchOrders = async () => {
