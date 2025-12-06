@@ -76,7 +76,7 @@ export default function HomePage() {
             >
               <Button
                 onClick={() => navigate('/catalog')}
-                className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black px-8 py-6 text-lg font-bold"
+                className="skew-button bg-primary hover:bg-primary-hover text-black px-8 py-6 text-lg font-bold"
                 data-testid="hero-cta-button"
               >
                 <span className="flex items-center">
