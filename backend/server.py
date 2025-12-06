@@ -185,6 +185,33 @@ class AdminStats(BaseModel):
     total_orders: int
     total_revenue: float
 
+# === Transaction Models ===
+class TransactionCreate(BaseModel):
+    amount: float
+    type: str  # deposit, withdrawal
+    method: Optional[str] = None  # stripe, bank_transfer, etc.
+    description: Optional[str] = None
+
+class Transaction(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    amount: float
+    type: str  # deposit, withdrawal
+    status: str  # pending, completed, failed, cancelled
+    method: Optional[str] = None
+    description: Optional[str] = None
+    created_at: datetime
+
+class DepositRequest(BaseModel):
+    amount: float
+    method: str = "stripe"  # stripe, card, etc.
+
+class WithdrawalRequest(BaseModel):
+    amount: float
+    method: str = "bank_transfer"
+    account_details: Optional[str] = None
+
 # === Helper Functions ===
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
