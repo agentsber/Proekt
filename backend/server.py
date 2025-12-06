@@ -38,6 +38,13 @@ security = HTTPBearer()
 # Create the main app without a prefix
 app = FastAPI()
 
+# Create uploads directory if not exists
+UPLOAD_DIR = Path("/app/backend/uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# Mount static files
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
