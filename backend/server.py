@@ -350,6 +350,94 @@ async def get_me(user: dict = Depends(get_current_user)):
     user["created_at"] = datetime.fromisoformat(user["created_at"])
     return User(**user)
 
+# === Balance & Transactions Routes ===
+@api_router.get("/balance")
+async def get_balance(user: dict = Depends(get_current_user)):
+    """Get current user balance"""
+    return {"balance": user.get("balance", 0.0)}
+
+@api_router.post("/balance/deposit")
+async def deposit_balance(request: DepositRequest, user: dict = Depends(get_current_user)):
+    """Deposit money to user balance"""
+    # Create transaction record
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "amount": request.amount,
+        "type": "deposit",
+        "status": "completed",  # In real app, would be "pending" until payment confirmed
+        "method": request.method,
+        "description": f"Deposit via {request.method}",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.transactions.insert_one(transaction)
+    
+    # Update user balance
+    new_balance = user.get("balance", 0.0) + request.amount
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"balance": new_balance}}
+    )
+    
+    return {
+        "message": "Deposit successful",
+        "transaction_id": transaction["id"],
+        "new_balance": new_balance
+    }
+
+@api_router.post("/balance/withdrawal")
+async def withdraw_balance(request: WithdrawalRequest, user: dict = Depends(get_current_user)):
+    """Withdraw money from user balance"""
+    current_balance = user.get("balance", 0.0)
+    
+    # Check if user has sufficient balance
+    if current_balance < request.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    
+    # Create transaction record
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "amount": request.amount,
+        "type": "withdrawal",
+        "status": "pending",  # Pending admin approval
+        "method": request.method,
+        "description": f"Withdrawal via {request.method}",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.transactions.insert_one(transaction)
+    
+    # Update user balance (deduct immediately)
+    new_balance = current_balance - request.amount
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"balance": new_balance}}
+    )
+    
+    return {
+        "message": "Withdrawal request submitted",
+        "transaction_id": transaction["id"],
+        "new_balance": new_balance,
+        "status": "pending"
+    }
+
+@api_router.get("/transactions", response_model=List[Transaction])
+async def get_transactions(
+    user: dict = Depends(get_current_user),
+    skip: int = 0,
+    limit: int = 20
+):
+    """Get user transaction history"""
+    transactions = await db.transactions.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for t in transactions:
+        t["created_at"] = datetime.fromisoformat(t["created_at"])
+    
+    return transactions
+
 # === Product Routes ===
 @api_router.get("/products", response_model=List[Product])
 async def get_products(
