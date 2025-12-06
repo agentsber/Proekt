@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AuthContext, API, SiteSettingsContext } from '@/App';
-import { Users, Package, ShoppingBag, DollarSign, Plus, Edit, Trash2, FolderTree, Palette, TrendingUp, Gift, CreditCard, Settings, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Users, Package, ShoppingBag, DollarSign, Plus, Edit, Trash2, FolderTree, Palette, TrendingUp, Gift, CreditCard, Settings, CheckCircle, XCircle, Clock, BarChart3, PieChart, LineChart } from 'lucide-react';
+import { LineChart as RechartsLine, Line, BarChart, Bar, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 
 export default function AdminPage() {
