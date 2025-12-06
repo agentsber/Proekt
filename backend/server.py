@@ -870,6 +870,137 @@ async def get_admin_stats(user: dict = Depends(require_admin)):
         total_revenue=total_revenue
     )
 
+@api_router.get("/admin/stats/advanced")
+async def get_advanced_stats(user: dict = Depends(require_admin)):
+    """Get advanced statistics with charts data"""
+    from datetime import timedelta
+    
+    # Basic stats
+    total_users = await db.users.count_documents({})
+    total_products = await db.products.count_documents({})
+    total_orders = await db.orders.count_documents({})
+    total_transactions = await db.transactions.count_documents({})
+    
+    # Revenue
+    revenue_pipeline = [
+        {"$match": {"status": "paid"}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ]
+    revenue_result = await db.orders.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0.0
+    
+    # Users by role
+    users_by_role = {}
+    for role in ["buyer", "seller", "admin"]:
+        count = await db.users.count_documents({"role": role})
+        users_by_role[role] = count
+    
+    # Revenue by last 7 days
+    revenue_by_day = []
+    for i in range(6, -1, -1):
+        date = datetime.now(timezone.utc) - timedelta(days=i)
+        start_of_day = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = date.replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        pipeline = [
+            {
+                "$match": {
+                    "status": "paid",
+                    "created_at": {
+                        "$gte": start_of_day.isoformat(),
+                        "$lte": end_of_day.isoformat()
+                    }
+                }
+            },
+            {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+        ]
+        result = await db.orders.aggregate(pipeline).to_list(1)
+        daily_revenue = result[0]["total"] if result else 0.0
+        
+        revenue_by_day.append({
+            "date": date.strftime("%Y-%m-%d"),
+            "revenue": daily_revenue
+        })
+    
+    # Top selling products
+    top_products_pipeline = [
+        {"$unwind": "$items"},
+        {"$group": {
+            "_id": "$items.product_id",
+            "total_sold": {"$sum": "$items.quantity"},
+            "revenue": {"$sum": {"$multiply": ["$items.price", "$items.quantity"]}}
+        }},
+        {"$sort": {"total_sold": -1}},
+        {"$limit": 5}
+    ]
+    top_products_raw = await db.orders.aggregate(top_products_pipeline).to_list(5)
+    
+    top_products = []
+    for item in top_products_raw:
+        product = await db.products.find_one({"id": item["_id"]}, {"_id": 0})
+        if product:
+            top_products.append({
+                "id": item["_id"],
+                "title": product.get("title", "Unknown"),
+                "total_sold": item["total_sold"],
+                "revenue": item["revenue"]
+            })
+    
+    # Orders by status
+    orders_by_status = {}
+    for status in ["pending", "paid", "completed", "cancelled"]:
+        count = await db.orders.count_documents({"status": status})
+        orders_by_status[status] = count
+    
+    # Recent transactions
+    recent_transactions = await db.transactions.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(5).to_list(5)
+    
+    # Categories performance
+    categories = await db.categories.find({"level": 0}, {"_id": 0}).to_list(100)
+    categories_performance = []
+    for category in categories:
+        products_count = await db.products.count_documents({"category_id": category["id"]})
+        categories_performance.append({
+            "name": category["name"],
+            "products_count": products_count
+        })
+    
+    # User growth (last 30 days)
+    user_growth = []
+    for i in range(29, -1, -1):
+        date = datetime.now(timezone.utc) - timedelta(days=i)
+        start_of_day = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        count = await db.users.count_documents({
+            "created_at": {"$lte": start_of_day.isoformat()}
+        })
+        
+        user_growth.append({
+            "date": date.strftime("%Y-%m-%d"),
+            "total_users": count
+        })
+    
+    return {
+        "overview": {
+            "total_users": total_users,
+            "total_products": total_products,
+            "total_orders": total_orders,
+            "total_transactions": total_transactions,
+            "total_revenue": total_revenue,
+            "avg_order_value": total_revenue / total_orders if total_orders > 0 else 0
+        },
+        "users_by_role": users_by_role,
+        "revenue_by_day": revenue_by_day,
+        "top_products": top_products,
+        "orders_by_status": orders_by_status,
+        "recent_transactions": recent_transactions,
+        "categories_performance": categories_performance,
+        "user_growth": user_growth[-7:]  # Last 7 days only for display
+    }
+
 @api_router.get("/admin/users")
 async def get_all_users(user: dict = Depends(require_admin), skip: int = 0, limit: int = 50):
     users = await db.users.find({}, {"_id": 0, "password_hash": 0}).skip(skip).limit(limit).to_list(limit)
