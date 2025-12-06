@@ -8,12 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AuthContext, API } from '@/App';
+import { AuthContext, API, SiteSettingsContext } from '@/App';
 import { Users, Package, ShoppingBag, DollarSign, Plus, Edit, Trash2, FolderTree, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminPage() {
   const { token } = useContext(AuthContext);
+  const { fetchSiteSettings } = useContext(SiteSettingsContext);
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
