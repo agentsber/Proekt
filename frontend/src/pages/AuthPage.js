@@ -93,7 +93,7 @@ export default function AuthPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#00ff9d] hover:bg-[#00cc7d] text-black font-bold"
+                    className="w-full bg-primary hover:bg-primary-hover text-black font-bold"
                     disabled={loading}
                     data-testid="login-submit-button"
                   >
@@ -152,7 +152,7 @@ export default function AuthPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#00ff9d] hover:bg-[#00cc7d] text-black font-bold"
+                    className="w-full bg-primary hover:bg-primary-hover text-black font-bold"
                     disabled={loading}
                     data-testid="register-submit-button"
                   >

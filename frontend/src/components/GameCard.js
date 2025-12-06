@@ -10,8 +10,11 @@ export const GameCard = ({ product, onFavorite }) => {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group relative overflow-hidden rounded-xl border border-[#30363d] bg-[#0d1117] transition-all hover:border-[#00ff9d] hover:shadow-[0_0_20px_rgba(0,255,157,0.3)] game-card-hover"
+      className="group relative overflow-hidden rounded-xl border border-[#30363d] bg-[#0d1117] transition-all hover:border-primary hover:shadow-[0_0_20px_rgba(0,255,157,0.3)] game-card-hover"
       data-testid={`product-card-${product.id}`}
+      style={{
+        '--hover-border': 'var(--site-primary)'
+      }}
     >
       {/* Image */}
       <div className="aspect-[3/4] overflow-hidden bg-[#161b22]">
@@ -26,7 +29,7 @@ export const GameCard = ({ product, onFavorite }) => {
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-2.5 py-0.5 text-xs font-semibold text-[#00ff9d]">
+          <span className="inline-flex items-center rounded-full border border-primary bg-primary-10 px-2.5 py-0.5 text-xs font-semibold text-primary">
             {product.product_type}
           </span>
           {onFavorite && (
@@ -35,7 +38,7 @@ export const GameCard = ({ product, onFavorite }) => {
                 e.preventDefault();
                 onFavorite(product.id);
               }}
-              className="p-1.5 rounded-full bg-black/50 hover:bg-[#00ff9d] hover:text-black transition-colors"
+              className="p-1.5 rounded-full bg-black/50 hover:bg-primary hover:text-black transition-colors"
               data-testid={`favorite-btn-${product.id}`}
             >
               <Heart className="w-4 h-4" />
@@ -52,7 +55,7 @@ export const GameCard = ({ product, onFavorite }) => {
         </p>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-[#00ff9d]" data-testid={`product-price-${product.id}`}>
+          <span className="text-2xl font-bold text-primary" data-testid={`product-price-${product.id}`}>
             {formatPrice(product.price, currency)}
           </span>
           <div className="flex items-center space-x-3 text-xs text-[#8b949e]">
