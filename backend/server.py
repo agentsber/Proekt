@@ -224,6 +224,62 @@ async def require_seller(user: dict = Depends(get_current_user)) -> dict:
         raise HTTPException(status_code=403, detail="Seller access required")
     return user
 
+# === File Upload Routes ===
+@api_router.post("/upload/image")
+async def upload_image(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    """Upload image and return URL"""
+    try:
+        # Validate file type
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # Generate unique filename
+        file_extension = Path(file.filename).suffix
+        unique_filename = f"{uuid.uuid4()}{file_extension}"
+        file_path = UPLOAD_DIR / unique_filename
+        
+        # Save file
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Get backend URL from environment
+        backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+        image_url = f"{backend_url}/uploads/{unique_filename}"
+        
+        return {"url": image_url, "filename": unique_filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
+
+@api_router.post("/upload/images")
+async def upload_multiple_images(files: List[UploadFile] = File(...), user: dict = Depends(get_current_user)):
+    """Upload multiple images and return URLs"""
+    uploaded_urls = []
+    
+    for file in files:
+        try:
+            # Validate file type
+            if not file.content_type.startswith('image/'):
+                continue
+            
+            # Generate unique filename
+            file_extension = Path(file.filename).suffix
+            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            file_path = UPLOAD_DIR / unique_filename
+            
+            # Save file
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            
+            # Get backend URL from environment
+            backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+            image_url = f"{backend_url}/uploads/{unique_filename}"
+            uploaded_urls.append(image_url)
+        except Exception as e:
+            print(f"Failed to upload {file.filename}: {str(e)}")
+            continue
+    
+    return {"urls": uploaded_urls, "count": len(uploaded_urls)}
+
 # === Auth Routes ===
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(data: UserRegister):
