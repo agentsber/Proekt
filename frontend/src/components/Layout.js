@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Settings, Search, Menu } from 'lucide-react';
-import { AuthContext, CartContext, CurrencyContext } from '@/App';
+import { AuthContext, CartContext, CurrencyContext, SiteSettingsContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
