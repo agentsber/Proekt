@@ -108,6 +108,17 @@ export default function AdminPage() {
     }
   };
 
+  const fetchAdvancedStats = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/stats/advanced`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAdvancedStats(response.data);
+    } catch (error) {
+      console.error('Failed to fetch advanced stats:', error);
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API}/admin/users`, {
