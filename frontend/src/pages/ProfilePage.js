@@ -56,19 +56,33 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Profile Header */}
         <div className="glass-panel rounded-xl p-8 mb-8" data-testid="profile-header">
-          <div className="flex items-center space-x-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-full flex items-center justify-center">
-              <User className="w-12 h-12 text-black" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-full flex items-center justify-center">
+                <User className="w-12 h-12 text-black" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Unbounded' }} data-testid="user-name">
+                  {user?.full_name}
+                </h1>
+                <p className="text-[#8b949e]" data-testid="user-email">{user?.email}</p>
+                <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-3 py-1 text-xs font-semibold text-[#00ff9d] mt-2">
+                  {user?.role}
+                </span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Unbounded' }} data-testid="user-name">
-                {user?.full_name}
-              </h1>
-              <p className="text-[#8b949e]" data-testid="user-email">{user?.email}</p>
-              <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-3 py-1 text-xs font-semibold text-[#00ff9d] mt-2">
-                {user?.role}
-              </span>
-            </div>
+            {(user?.role === 'seller' || user?.role === 'admin') && (
+              <Button
+                onClick={() => window.location.href = '/seller-dashboard'}
+                className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black"
+                data-testid="manage-products-button"
+              >
+                <span className="flex items-center">
+                  <Package className="w-5 h-5 mr-2" />
+                  Управление товарами
+                </span>
+              </Button>
+            )}
           </div>
         </div>
 
