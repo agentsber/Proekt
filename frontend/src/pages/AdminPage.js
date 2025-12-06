@@ -710,12 +710,50 @@ export default function AdminPage() {
                       </select>
                     </div>
                     <div>
-                      <Label>URL изображений (через запятую)</Label>
-                      <Input
-                        value={productForm.images}
-                        onChange={(e) => setProductForm({ ...productForm, images: e.target.value })}
-                        placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                      />
+                      <Label>Изображения товара</Label>
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageSelect}
+                            className="flex-1"
+                          />
+                          <span className="text-xs text-[#8b949e]">или</span>
+                        </div>
+                        <Input
+                          value={productForm.images}
+                          onChange={(e) => setProductForm({ ...productForm, images: e.target.value })}
+                          placeholder="URL изображений через запятую"
+                        />
+                        
+                        {imagePreview.length > 0 && (
+                          <div className="grid grid-cols-3 gap-2">
+                            {imagePreview.map((preview, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={preview} 
+                                  alt={`Preview ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg border border-[#30363d]"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeImagePreview(index)}
+                                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {uploadingImages && (
+                          <p className="text-xs text-[#00ff9d]">Загрузка изображений...</p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex justify-end space-x-3 pt-4">
                       <Button
