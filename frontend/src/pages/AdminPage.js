@@ -600,12 +600,35 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="mb-8">
-            <TabsTrigger value="users" data-testid="users-tab">Пользователи</TabsTrigger>
-            <TabsTrigger value="categories" data-testid="categories-tab">Категории</TabsTrigger>
-            <TabsTrigger value="products" data-testid="products-tab">Товары</TabsTrigger>
-            <TabsTrigger value="orders" data-testid="orders-tab">Заказы</TabsTrigger>
-            <TabsTrigger value="design" data-testid="design-tab">Дизайн</TabsTrigger>
+          <TabsList className="mb-8 flex-wrap">
+            <TabsTrigger value="users" data-testid="users-tab">
+              <Users className="w-4 h-4 mr-2" />
+              Пользователи
+            </TabsTrigger>
+            <TabsTrigger value="transactions" data-testid="transactions-tab">
+              <CreditCard className="w-4 h-4 mr-2" />
+              Транзакции
+            </TabsTrigger>
+            <TabsTrigger value="categories" data-testid="categories-tab">
+              <FolderTree className="w-4 h-4 mr-2" />
+              Категории
+            </TabsTrigger>
+            <TabsTrigger value="products" data-testid="products-tab">
+              <Package className="w-4 h-4 mr-2" />
+              Товары
+            </TabsTrigger>
+            <TabsTrigger value="orders" data-testid="orders-tab">
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              Заказы
+            </TabsTrigger>
+            <TabsTrigger value="giveaways" data-testid="giveaways-tab">
+              <Gift className="w-4 h-4 mr-2" />
+              Раздачи
+            </TabsTrigger>
+            <TabsTrigger value="design" data-testid="design-tab">
+              <Palette className="w-4 h-4 mr-2" />
+              Дизайн
+            </TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
