@@ -296,9 +296,8 @@ async def upload_multiple_images(files: List[UploadFile] = File(...), user: dict
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             
-            # Get backend URL from environment
-            backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
-            image_url = f"{backend_url}/uploads/{unique_filename}"
+            # Return relative URL path (will be accessible via /uploads/...)
+            image_url = f"/uploads/{unique_filename}"
             uploaded_urls.append(image_url)
         except Exception as e:
             print(f"Failed to upload {file.filename}: {str(e)}")
