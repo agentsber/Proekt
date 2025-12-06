@@ -126,7 +126,7 @@ export default function ProductPage() {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[#8b949e]">Цена:</span>
                 <span className="text-4xl font-bold text-[#00ff9d]" data-testid="product-price">
-                  ${product.price}
+                  {formatPrice(product.price, currency)}
                 </span>
               </div>
 
