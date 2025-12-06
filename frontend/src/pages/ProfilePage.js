@@ -66,6 +66,84 @@ export default function ProfilePage() {
     }
   };
 
+  const fetchBalance = async () => {
+    try {
+      const response = await axios.get(`${API}/balance`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBalance(response.data.balance);
+    } catch (error) {
+      console.error('Failed to fetch balance:', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get(`${API}/transactions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
+    }
+  };
+
+  const handleDeposit = async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(depositAmount);
+    if (amount <= 0) {
+      toast.error('Сумма должна быть больше 0');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/balance/deposit`, 
+        { amount, method: 'stripe' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setBalance(response.data.new_balance);
+      setDepositModalOpen(false);
+      setDepositAmount('');
+      fetchTransactions();
+      toast.success(`Баланс пополнен на $${amount.toFixed(2)}`);
+    } catch (error) {
+      toast.error('Ошибка пополнения баланса');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(withdrawAmount);
+    if (amount <= 0) {
+      toast.error('Сумма должна быть больше 0');
+      return;
+    }
+    if (amount > balance) {
+      toast.error('Недостаточно средств');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/balance/withdrawal`,
+        { amount, method: 'bank_transfer' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setBalance(response.data.new_balance);
+      setWithdrawModalOpen(false);
+      setWithdrawAmount('');
+      fetchTransactions();
+      toast.success(`Заявка на вывод $${amount.toFixed(2)} создана`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ошибка вывода средств');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
