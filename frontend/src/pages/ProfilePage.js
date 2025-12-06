@@ -4,14 +4,26 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthContext, FavoritesContext, API } from '@/App';
-import { Package, Heart, Eye, User } from 'lucide-react';
+import { Package, Heart, Eye, User, Wallet, Plus, Minus, DollarSign, History } from 'lucide-react';
 import { GameCard } from '@/components/GameCard';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const { user, token } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [favoritesProducts, setFavoritesProducts] = useState([]);
   const [viewed, setViewed] = useState([]);
+  const [balance, setBalance] = useState(user?.balance || 0);
+  const [transactions, setTransactions] = useState([]);
+  
+  // Modal states
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchOrders();
