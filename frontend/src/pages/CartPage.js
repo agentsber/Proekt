@@ -97,7 +97,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-xl font-bold">
                   <span>Итого:</span>
-                  <span className="text-[#00ff9d]" data-testid="cart-total">${total.toFixed(2)}</span>
+                  <span className="text-[#00ff9d]" data-testid="cart-total">{formatPrice(total, currency)}</span>
                 </div>
               </div>
               <Button
