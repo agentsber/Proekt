@@ -82,6 +82,12 @@ export const Layout = ({ children }) => {
                       <User className="w-4 h-4 mr-2" />
                       Профиль
                     </DropdownMenuItem>
+                    {(user.role === 'seller' || user.role === 'admin') && (
+                      <DropdownMenuItem onClick={() => navigate('/seller-dashboard')} data-testid="seller-dashboard-menu-item">
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Мои товары
+                      </DropdownMenuItem>
+                    )}
                     {user.role === 'admin' && (
                       <DropdownMenuItem onClick={() => navigate('/admin')} data-testid="admin-menu-item">
                         <Settings className="w-4 h-4 mr-2" />
