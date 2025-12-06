@@ -286,6 +286,54 @@ export default function ProfilePage() {
             )}
           </TabsContent>
 
+          <TabsContent value="transactions">
+            {transactions.length === 0 ? (
+              <div className="text-center py-12 text-[#8b949e]" data-testid="no-transactions">
+                У вас пока нет транзакций
+              </div>
+            ) : (
+              <div className="space-y-4" data-testid="transactions-list">
+                {transactions.map(transaction => (
+                  <div key={transaction.id} className="glass-panel rounded-xl p-6" data-testid={`transaction-${transaction.id}`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          transaction.type === 'deposit' ? 'bg-green-500/10' : 'bg-red-500/10'
+                        }`}>
+                          {transaction.type === 'deposit' ? (
+                            <Plus className="w-6 h-6 text-green-500" />
+                          ) : (
+                            <Minus className="w-6 h-6 text-red-500" />
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-1">
+                            {transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'} ${transaction.amount.toFixed(2)}
+                          </h3>
+                          <p className="text-sm text-[#8b949e]">
+                            {new Date(transaction.created_at).toLocaleString('ru-RU')}
+                          </p>
+                          {transaction.description && (
+                            <p className="text-xs text-[#8b949e] mt-1">{transaction.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                        transaction.status === 'completed' ? 'bg-green-500/10 text-green-500 border border-green-500' :
+                        transaction.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500' :
+                        'bg-red-500/10 text-red-500 border border-red-500'
+                      }`}>
+                        {transaction.status === 'completed' ? 'Завершено' :
+                         transaction.status === 'pending' ? 'В обработке' : 
+                         'Отменено'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="favorites">
             {favoritesProducts.length === 0 ? (
               <div className="text-center py-12 text-[#8b949e]" data-testid="no-favorites">
