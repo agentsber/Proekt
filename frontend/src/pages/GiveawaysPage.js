@@ -43,7 +43,7 @@ export default function GiveawaysPage() {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12" data-testid="giveaways-header">
-          <Gift className="w-16 h-16 text-[#00ff9d] mx-auto mb-4" />
+          <Gift className="w-16 h-16 text-primary mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'Unbounded' }}>
             Раздачи
           </h1>
@@ -76,7 +76,7 @@ export default function GiveawaysPage() {
                 </div>
                 <Button
                   onClick={() => handleEnter(giveaway.id)}
-                  className="w-full skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black font-bold"
+                  className="w-full skew-button bg-primary hover:bg-primary-hover text-black font-bold"
                   disabled={user && giveaway.entries.includes(user.id)}
                   data-testid={`enter-giveaway-${giveaway.id}`}
                 >

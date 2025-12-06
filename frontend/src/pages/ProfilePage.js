@@ -59,7 +59,7 @@ export default function ProfilePage() {
         <div className="glass-panel rounded-xl p-8 mb-8" data-testid="profile-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, var(--site-primary), var(--site-primary-hover))' }}>
                 <User className="w-12 h-12 text-black" />
               </div>
               <div>
@@ -67,7 +67,7 @@ export default function ProfilePage() {
                   {user?.full_name}
                 </h1>
                 <p className="text-[#8b949e]" data-testid="user-email">{user?.email}</p>
-                <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-3 py-1 text-xs font-semibold text-[#00ff9d] mt-2">
+                <span className="inline-flex items-center rounded-full border border-primary bg-primary-10 px-3 py-1 text-xs font-semibold text-primary mt-2">
                   {user?.role}
                 </span>
               </div>
@@ -75,7 +75,7 @@ export default function ProfilePage() {
             {(user?.role === 'seller' || user?.role === 'admin') && (
               <Button
                 onClick={() => window.location.href = '/seller-dashboard'}
-                className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black"
+                className="skew-button bg-primary hover:bg-primary-hover text-black"
                 data-testid="manage-products-button"
               >
                 <span className="flex items-center">
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                         <p className="text-sm text-[#8b949e]">{new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
                       <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                        order.status === 'paid' ? 'bg-[#00ff9d]/10 text-[#00ff9d] border border-[#00ff9d]' :
+                        order.status === 'paid' ? 'bg-primary-10 text-primary border border-primary' :
                         order.status === 'pending' ? 'bg-[#ffbd00]/10 text-[#ffbd00] border border-[#ffbd00]' :
                         'bg-[#8b949e]/10 text-[#8b949e] border border-[#8b949e]'
                       }`}>
@@ -130,13 +130,13 @@ export default function ProfilePage() {
                       {order.items.map((item, idx) => (
                         <div key={idx} className="flex justify-between text-sm">
                           <span>{item.title} x {item.quantity}</span>
-                          <span className="text-[#00ff9d]">${(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="text-primary">${(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
                     <div className="flex justify-between font-bold pt-4 border-t border-[#30363d]">
                       <span>Итого:</span>
-                      <span className="text-[#00ff9d]">${order.total.toFixed(2)}</span>
+                      <span className="text-primary">${order.total.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
