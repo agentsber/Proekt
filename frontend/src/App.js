@@ -139,6 +139,59 @@ function App() {
     setCart([]);
   };
 
+  // Favorites management
+  useEffect(() => {
+    if (user && token) {
+      fetchFavorites();
+    } else {
+      setFavorites([]);
+    }
+  }, [user, token]);
+
+  const fetchFavorites = async () => {
+    if (!token) return;
+    try {
+      const response = await axios.get(`${API}/favorites/my`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFavorites(response.data.map(p => p.id));
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+    }
+  };
+
+  const toggleFavorite = async (productId) => {
+    if (!user || !token) {
+      // Redirect to auth if not logged in
+      window.location.href = '/auth';
+      return;
+    }
+
+    const isFavorite = favorites.includes(productId);
+    
+    try {
+      if (isFavorite) {
+        await axios.delete(`${API}/favorites/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setFavorites(prev => prev.filter(id => id !== productId));
+      } else {
+        await axios.post(`${API}/favorites?product_id=${productId}`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setFavorites(prev => [...prev, productId]);
+      }
+      return !isFavorite;
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      throw error;
+    }
+  };
+
+  const isFavorite = (productId) => {
+    return favorites.includes(productId);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#02040a] flex items-center justify-center">
