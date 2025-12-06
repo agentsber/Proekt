@@ -804,6 +804,10 @@ async def delete_category(category_id: str, user: dict = Depends(require_admin))
     return {"message": "Category deleted successfully"}
 
 # === Admin Site Settings ===
+class NavigationLink(BaseModel):
+    title: str
+    url: str
+
 class SiteSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     primary_color: str = "#00ff9d"
@@ -815,6 +819,9 @@ class SiteSettings(BaseModel):
     site_description: str = "Маркетплейс игровых товаров"
     logo_url: Optional[str] = None
     hero_image: Optional[str] = None
+    footer_navigation: List[NavigationLink] = []
+    footer_support: List[NavigationLink] = []
+    footer_legal: List[NavigationLink] = []
 
 @api_router.get("/admin/settings")
 async def get_site_settings(user: dict = Depends(require_admin)):
