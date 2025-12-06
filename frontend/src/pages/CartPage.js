@@ -53,7 +53,7 @@ export default function CartPage() {
                   <div className="flex-1">
                     <h3 className="font-bold mb-1" data-testid={`cart-item-title-${item.id}`}>{item.title}</h3>
                     <p className="text-sm text-[#8b949e] mb-2">{item.product_type}</p>
-                    <p className="text-[#00ff9d] font-bold" data-testid={`cart-item-price-${item.id}`}>${item.price}</p>
+                    <p className="text-[#00ff9d] font-bold" data-testid={`cart-item-price-${item.id}`}>{formatPrice(item.price, currency)}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
