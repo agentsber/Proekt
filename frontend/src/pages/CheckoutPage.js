@@ -116,11 +116,11 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-[#8b949e]">Сумма:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatPrice(total, currency)}</span>
                 </div>
                 <div className="flex justify-between text-xl font-bold pt-3 border-t border-[#30363d]">
                   <span>К оплате:</span>
-                  <span className="text-[#00ff9d]" data-testid="checkout-total">${total.toFixed(2)}</span>
+                  <span className="text-[#00ff9d]" data-testid="checkout-total">{formatPrice(total, currency)}</span>
                 </div>
               </div>
               <Button
