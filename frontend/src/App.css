@@ -1,34 +1,40 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* App specific styles */
+.hero-glow {
+  position: relative;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.hero-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 255, 157, 0.15) 0%, rgba(0,0,0,0) 70%);
+  pointer-events: none;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.neon-text {
+  text-shadow: 0 0 20px rgba(0, 255, 157, 0.5), 0 0 40px rgba(0, 255, 157, 0.3);
 }
 
-.App-link {
-    color: #61dafb;
+.game-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.skew-button {
+  transform: skewX(-10deg);
+}
+
+.skew-button span {
+  display: inline-block;
+  transform: skewX(10deg);
+}
+
+.glass-panel {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
