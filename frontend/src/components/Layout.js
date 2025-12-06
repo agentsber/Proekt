@@ -106,7 +106,7 @@ export const Layout = ({ children }) => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button onClick={() => navigate('/auth')} className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black" data-testid="login-button">
+                <Button onClick={() => navigate('/auth')} className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="login-button">
                   <span>Войти</span>
                 </Button>
               )}
