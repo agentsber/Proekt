@@ -701,6 +701,98 @@ async def get_all_orders(user: dict = Depends(require_admin), skip: int = 0, lim
     orders = await db.orders.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
     return orders
 
+# === Admin Category Management ===
+@api_router.put("/categories/{category_id}")
+async def update_category(category_id: str, data: CategoryCreate, user: dict = Depends(require_admin)):
+    category = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    level = 0
+    if data.parent_id:
+        parent = await db.categories.find_one({"id": data.parent_id}, {"_id": 0})
+        if parent:
+            level = parent.get("level", 0) + 1
+    
+    update_data = {**data.model_dump(), "level": level}
+    await db.categories.update_one({"id": category_id}, {"$set": update_data})
+    
+    updated = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    return Category(**updated)
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str, user: dict = Depends(require_admin)):
+    # Check if category has products
+    products_count = await db.products.count_documents({"category_id": category_id})
+    if products_count > 0:
+        raise HTTPException(status_code=400, detail=f"Cannot delete category with {products_count} products")
+    
+    # Check if category has subcategories
+    subcategories = await db.categories.count_documents({"parent_id": category_id})
+    if subcategories > 0:
+        raise HTTPException(status_code=400, detail=f"Cannot delete category with {subcategories} subcategories")
+    
+    result = await db.categories.delete_one({"id": category_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return {"message": "Category deleted successfully"}
+
+# === Admin Site Settings ===
+class SiteSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    primary_color: str = "#00ff9d"
+    secondary_color: str = "#0d1117"
+    accent_color: str = "#00cc7d"
+    background_color: str = "#02040a"
+    text_color: str = "#ffffff"
+    site_name: str = "GameHub"
+    site_description: str = "Маркетплейс игровых товаров"
+    logo_url: Optional[str] = None
+    hero_image: Optional[str] = None
+
+@api_router.get("/admin/settings")
+async def get_site_settings(user: dict = Depends(require_admin)):
+    settings = await db.site_settings.find_one({}, {"_id": 0})
+    if not settings:
+        # Return default settings
+        default_settings = {
+            "primary_color": "#00ff9d",
+            "secondary_color": "#0d1117",
+            "accent_color": "#00cc7d",
+            "background_color": "#02040a",
+            "text_color": "#ffffff",
+            "site_name": "GameHub",
+            "site_description": "Маркетплейс игровых товаров",
+            "logo_url": None,
+            "hero_image": None
+        }
+        await db.site_settings.insert_one(default_settings)
+        return default_settings
+    return settings
+
+@api_router.put("/admin/settings")
+async def update_site_settings(settings: SiteSettings, user: dict = Depends(require_admin)):
+    settings_dict = settings.model_dump()
+    await db.site_settings.update_one({}, {"$set": settings_dict}, upsert=True)
+    return {"message": "Settings updated successfully", "settings": settings_dict}
+
+@api_router.get("/settings/public")
+async def get_public_settings():
+    """Public endpoint for frontend to get site settings"""
+    settings = await db.site_settings.find_one({}, {"_id": 0})
+    if not settings:
+        return {
+            "primary_color": "#00ff9d",
+            "secondary_color": "#0d1117",
+            "accent_color": "#00cc7d",
+            "background_color": "#02040a",
+            "text_color": "#ffffff",
+            "site_name": "GameHub",
+            "site_description": "Маркетплейс игровых товаров"
+        }
+    return settings
+
 # === Chat Routes (Simple) ===
 @api_router.post("/chats")
 async def create_chat(seller_id: str, product_id: str, user: dict = Depends(get_current_user)):
