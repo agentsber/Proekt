@@ -420,7 +420,7 @@ export default function AdminPage() {
       <div key={cat.id} style={{ marginLeft: `${level * 20}px` }}>
         <div className="flex items-center justify-between py-3 border-b border-[#30363d]" data-testid={`category-${cat.id}`}>
           <div className="flex items-center space-x-2">
-            <FolderTree className="w-4 h-4 text-[#00ff9d]" />
+            <FolderTree className="w-4 h-4 text-primary" />
             <span className="font-semibold">{cat.name}</span>
             <span className="text-xs text-[#8b949e]">({cat.slug})</span>
             {level > 0 && <span className="text-xs text-[#8b949e]">- Подкатегория</span>}
@@ -460,28 +460,28 @@ export default function AdminPage() {
             <div className="glass-panel rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[#8b949e]">Пользователи</span>
-                <Users className="w-5 h-5 text-[#00ff9d]" />
+                <Users className="w-5 h-5 text-primary" />
               </div>
               <p className="text-3xl font-bold" data-testid="total-users">{stats.total_users}</p>
             </div>
             <div className="glass-panel rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[#8b949e]">Товары</span>
-                <Package className="w-5 h-5 text-[#00ff9d]" />
+                <Package className="w-5 h-5 text-primary" />
               </div>
               <p className="text-3xl font-bold" data-testid="total-products">{stats.total_products}</p>
             </div>
             <div className="glass-panel rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[#8b949e]">Заказы</span>
-                <ShoppingBag className="w-5 h-5 text-[#00ff9d]" />
+                <ShoppingBag className="w-5 h-5 text-primary" />
               </div>
               <p className="text-3xl font-bold" data-testid="total-orders">{stats.total_orders}</p>
             </div>
             <div className="glass-panel rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[#8b949e]">Доход</span>
-                <DollarSign className="w-5 h-5 text-[#00ff9d]" />
+                <DollarSign className="w-5 h-5 text-primary" />
               </div>
               <p className="text-3xl font-bold" data-testid="total-revenue">${stats.total_revenue.toFixed(2)}</p>
             </div>
@@ -515,7 +515,7 @@ export default function AdminPage() {
                       <td className="px-6 py-4">{user.full_name}</td>
                       <td className="px-6 py-4 text-[#8b949e]">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center rounded-full border border-[#00ff9d] bg-[#00ff9d]/10 px-2.5 py-0.5 text-xs font-semibold text-[#00ff9d]">
+                        <span className="inline-flex items-center rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                           {user.role}
                         </span>
                       </td>
@@ -540,7 +540,7 @@ export default function AdminPage() {
                 }
               }}>
                 <DialogTrigger asChild>
-                  <Button className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black" data-testid="add-category-button">
+                  <Button className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="add-category-button">
                     <span className="flex items-center">
                       <Plus className="w-5 h-5 mr-2" />
                       Добавить категорию
@@ -624,7 +624,7 @@ export default function AdminPage() {
                       </Button>
                       <Button
                         type="submit"
-                        className="bg-[#00ff9d] hover:bg-[#00cc7d] text-black"
+                        className="bg-primary hover:bg-primary-hover text-black"
                         data-testid="submit-category-button"
                       >
                         {editingCategory ? 'Обновить' : 'Создать'}
@@ -660,7 +660,7 @@ export default function AdminPage() {
                 }
               }}>
                 <DialogTrigger asChild>
-                  <Button className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black" data-testid="add-product-button-admin">
+                  <Button className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="add-product-button-admin">
                     <span className="flex items-center">
                       <Plus className="w-5 h-5 mr-2" />
                       Добавить товар
@@ -796,7 +796,7 @@ export default function AdminPage() {
                           </div>
                         )}
                         {uploadingImages && (
-                          <p className="text-xs text-[#00ff9d]">Загрузка изображений...</p>
+                          <p className="text-xs text-primary">Загрузка изображений...</p>
                         )}
                       </div>
                     </div>
@@ -815,7 +815,7 @@ export default function AdminPage() {
                       </Button>
                       <Button
                         type="submit"
-                        className="bg-[#00ff9d] hover:bg-[#00cc7d] text-black"
+                        className="bg-primary hover:bg-primary-hover text-black"
                       >
                         {editingProduct ? 'Обновить' : 'Создать'}
                       </Button>
@@ -849,7 +849,7 @@ export default function AdminPage() {
                           <span>{product.title}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-[#00ff9d]">${product.price}</td>
+                      <td className="px-6 py-4 text-primary">${product.price}</td>
                       <td className="px-6 py-4 text-[#8b949e]">{product.stock}</td>
                       <td className="px-6 py-4 text-[#8b949e]">{product.sales_count}</td>
                       <td className="px-6 py-4">
@@ -891,10 +891,10 @@ export default function AdminPage() {
                   {orders.map(order => (
                     <tr key={order.id} className="border-t border-[#30363d]">
                       <td className="px-6 py-4">#{order.id.slice(0, 8)}</td>
-                      <td className="px-6 py-4 text-[#00ff9d]">${order.total.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-primary">${order.total.toFixed(2)}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          order.status === 'paid' ? 'bg-[#00ff9d]/10 text-[#00ff9d] border border-[#00ff9d]' :
+                          order.status === 'paid' ? 'bg-primary/10 text-primary border border-primary' :
                           'bg-[#8b949e]/10 text-[#8b949e] border border-[#8b949e]'
                         }`}>
                           {order.status}
@@ -914,7 +914,7 @@ export default function AdminPage() {
           <TabsContent value="design">
             <div className="glass-panel rounded-xl p-8">
               <div className="flex items-center mb-6">
-                <Palette className="w-8 h-8 text-[#00ff9d] mr-3" />
+                <Palette className="w-8 h-8 text-primary mr-3" />
                 <h2 className="text-2xl font-bold" style={{ fontFamily: 'Unbounded' }}>
                   Настройки дизайна сайта
                 </h2>
@@ -1069,7 +1069,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => addNavigationLink('footer_navigation')}
-                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                          className="text-xs text-primary hover:text-primary-hover"
                         >
                           + Добавить
                         </button>
@@ -1106,7 +1106,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => addNavigationLink('footer_support')}
-                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                          className="text-xs text-primary hover:text-primary-hover"
                         >
                           + Добавить
                         </button>
@@ -1143,7 +1143,7 @@ export default function AdminPage() {
                         <button
                           type="button"
                           onClick={() => addNavigationLink('footer_legal')}
-                          className="text-xs text-[#00ff9d] hover:text-[#00cc7d]"
+                          className="text-xs text-primary hover:text-primary-hover"
                         >
                           + Добавить
                         </button>
@@ -1219,7 +1219,7 @@ export default function AdminPage() {
                 <div className="flex justify-end">
                   <Button
                     type="submit"
-                    className="skew-button bg-[#00ff9d] hover:bg-[#00cc7d] text-black px-8"
+                    className="skew-button bg-primary hover:bg-primary-hover text-black px-8"
                     data-testid="save-settings-button"
                   >
                     <span>Сохранить настройки</span>
