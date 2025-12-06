@@ -837,7 +837,20 @@ async def get_site_settings(user: dict = Depends(require_admin)):
             "site_name": "GameHub",
             "site_description": "Маркетплейс игровых товаров",
             "logo_url": None,
-            "hero_image": None
+            "hero_image": None,
+            "footer_navigation": [
+                {"title": "Каталог", "url": "/catalog"},
+                {"title": "Раздачи", "url": "/giveaways"},
+                {"title": "Блог", "url": "/blog"}
+            ],
+            "footer_support": [
+                {"title": "FAQ", "url": "#"},
+                {"title": "Контакты", "url": "#"}
+            ],
+            "footer_legal": [
+                {"title": "Условия использования", "url": "#"},
+                {"title": "Политика конфиденциальности", "url": "#"}
+            ]
         }
         await db.site_settings.insert_one(default_settings)
         return default_settings
