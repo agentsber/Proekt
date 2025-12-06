@@ -121,34 +121,58 @@ export const Layout = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold mb-4" style={{ fontFamily: 'Unbounded' }}>GameHub</h3>
-              <p className="text-[#8b949e] text-sm">Маркетплейс игровых товаров</p>
+              <h3 className="font-bold mb-4" style={{ fontFamily: 'Unbounded' }}>
+                {siteSettings?.site_name || 'GameHub'}
+              </h3>
+              <p className="text-[#8b949e] text-sm">
+                {siteSettings?.site_description || 'Маркетплейс игровых товаров'}
+              </p>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Навигация</h4>
               <ul className="space-y-2 text-sm text-[#8b949e]">
-                <li><Link to="/catalog" className="hover:text-[#00ff9d]">Каталог</Link></li>
-                <li><Link to="/giveaways" className="hover:text-[#00ff9d]">Раздачи</Link></li>
-                <li><Link to="/blog" className="hover:text-[#00ff9d]">Блог</Link></li>
+                {siteSettings?.footer_navigation?.map((link, index) => (
+                  <li key={index}>
+                    {link.url.startsWith('/') ? (
+                      <Link to={link.url} className="hover:text-[#00ff9d]">{link.title}</Link>
+                    ) : (
+                      <a href={link.url} className="hover:text-[#00ff9d]">{link.title}</a>
+                    )}
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Поддержка</h4>
               <ul className="space-y-2 text-sm text-[#8b949e]">
-                <li><a href="#" className="hover:text-[#00ff9d]">FAQ</a></li>
-                <li><a href="#" className="hover:text-[#00ff9d]">Контакты</a></li>
+                {siteSettings?.footer_support?.map((link, index) => (
+                  <li key={index}>
+                    {link.url.startsWith('/') ? (
+                      <Link to={link.url} className="hover:text-[#00ff9d]">{link.title}</Link>
+                    ) : (
+                      <a href={link.url} className="hover:text-[#00ff9d]">{link.title}</a>
+                    )}
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Юридическое</h4>
               <ul className="space-y-2 text-sm text-[#8b949e]">
-                <li><a href="#" className="hover:text-[#00ff9d]">Условия использования</a></li>
-                <li><a href="#" className="hover:text-[#00ff9d]">Политика конфиденциальности</a></li>
+                {siteSettings?.footer_legal?.map((link, index) => (
+                  <li key={index}>
+                    {link.url.startsWith('/') ? (
+                      <Link to={link.url} className="hover:text-[#00ff9d]">{link.title}</Link>
+                    ) : (
+                      <a href={link.url} className="hover:text-[#00ff9d]">{link.title}</a>
+                    )}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-[#30363d] text-center text-sm text-[#8b949e]">
-            © 2025 GameHub. Все права защищены.
+            © 2025 {siteSettings?.site_name || 'GameHub'}. Все права защищены.
           </div>
         </div>
       </footer>
