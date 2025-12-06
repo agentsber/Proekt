@@ -139,27 +139,29 @@ function App() {
     <AuthContext.Provider value={{ user, token, login, logout }}>
       <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateCartQuantity, clearCart }}>
         <CurrencyContext.Provider value={{ currency, setCurrency }}>
-          <div className="App min-h-screen noise-bg">
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/catalog" element={<CatalogPage />} />
-                <Route path="/product/:id" element={<ProductPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/auth" />} />
-                <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
-                <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/profile" />} />
-                <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" />} />
-                <Route path="/seller-dashboard" element={user && user.role !== 'buyer' ? <SellerDashboard /> : <Navigate to="/auth" />} />
-                <Route path="/seller/:id" element={<SellerPage />} />
-                <Route path="/giveaways" element={<GiveawaysPage />} />
-                <Route path="/blog" element={<BlogPage />} />
-                <Route path="/blog/:slug" element={<BlogPostPage />} />
-                <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" />} />
-              </Routes>
-            </BrowserRouter>
-            <Toaster position="top-right" richColors />
-          </div>
+          <SiteSettingsContext.Provider value={{ siteSettings, fetchSiteSettings }}>
+            <div className="App min-h-screen noise-bg">
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/catalog" element={<CatalogPage />} />
+                  <Route path="/product/:id" element={<ProductPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/auth" />} />
+                  <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+                  <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/profile" />} />
+                  <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" />} />
+                  <Route path="/seller-dashboard" element={user && user.role !== 'buyer' ? <SellerDashboard /> : <Navigate to="/auth" />} />
+                  <Route path="/seller/:id" element={<SellerPage />} />
+                  <Route path="/giveaways" element={<GiveawaysPage />} />
+                  <Route path="/blog" element={<BlogPage />} />
+                  <Route path="/blog/:slug" element={<BlogPostPage />} />
+                  <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" />} />
+                </Routes>
+              </BrowserRouter>
+              <Toaster position="top-right" richColors />
+            </div>
+          </SiteSettingsContext.Provider>
         </CurrencyContext.Provider>
       </CartContext.Provider>
     </AuthContext.Provider>
