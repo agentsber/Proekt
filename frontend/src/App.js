@@ -61,9 +61,17 @@ function App() {
       const response = await axios.get(`${API}/settings/public`);
       setSiteSettings(response.data);
       
-      // Apply CSS variables
-      document.documentElement.style.setProperty('--primary-color', response.data.primary_color);
-      document.documentElement.style.setProperty('--accent-color', response.data.accent_color);
+      // Apply CSS variables dynamically
+      const root = document.documentElement;
+      root.style.setProperty('--site-primary', response.data.primary_color || '#00ff9d');
+      root.style.setProperty('--site-primary-hover', response.data.accent_color || '#00cc7d');
+      root.style.setProperty('--site-accent', response.data.accent_color || '#00cc7d');
+      root.style.setProperty('--site-background', response.data.background_color || '#02040a');
+      root.style.setProperty('--site-text', response.data.text_color || '#ffffff');
+      
+      // Legacy support
+      root.style.setProperty('--primary-color', response.data.primary_color || '#00ff9d');
+      root.style.setProperty('--accent-color', response.data.accent_color || '#00cc7d');
     } catch (error) {
       console.error('Failed to fetch site settings:', error);
     }
