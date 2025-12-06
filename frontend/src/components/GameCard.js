@@ -51,18 +51,18 @@ export const GameCard = ({ product }) => {
           <span className="inline-flex items-center rounded-full border border-primary bg-primary-10 px-2.5 py-0.5 text-xs font-semibold text-primary">
             {product.product_type}
           </span>
-          {onFavorite && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                onFavorite(product.id);
-              }}
-              className="p-1.5 rounded-full bg-black/50 hover:bg-primary hover:text-black transition-colors"
-              data-testid={`favorite-btn-${product.id}`}
-            >
-              <Heart className="w-4 h-4" />
-            </button>
-          )}
+          <button
+            onClick={handleFavoriteClick}
+            className={`p-1.5 rounded-full transition-colors ${
+              isInFavorites 
+                ? 'bg-primary text-black' 
+                : 'bg-black/50 hover:bg-primary hover:text-black'
+            }`}
+            data-testid={`favorite-btn-${product.id}`}
+            title={isInFavorites ? 'Удалить из избранного' : 'Добавить в избранное'}
+          >
+            <Heart className={`w-4 h-4 ${isInFavorites ? 'fill-current' : ''}`} />
+          </button>
         </div>
 
         <h3 className="text-lg font-bold mb-1 line-clamp-1" style={{ fontFamily: 'Unbounded' }} data-testid={`product-title-${product.id}`}>
