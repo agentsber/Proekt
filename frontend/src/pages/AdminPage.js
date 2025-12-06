@@ -469,20 +469,18 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <Label htmlFor="cat-parent">Родительская категория</Label>
-                      <Select 
-                        value={categoryForm.parent_id} 
-                        onValueChange={(val) => setCategoryForm({ ...categoryForm, parent_id: val })}
+                      <select
+                        id="cat-parent"
+                        value={categoryForm.parent_id}
+                        onChange={(e) => setCategoryForm({ ...categoryForm, parent_id: e.target.value })}
+                        className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-white"
+                        data-testid="category-parent-select"
                       >
-                        <SelectTrigger data-testid="category-parent-select">
-                          <SelectValue placeholder="Нет (корневая категория)" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="">Нет (корневая категория)</SelectItem>
-                          {categories.filter(c => c.level === 0).map(cat => (
-                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <option value="">Нет (корневая категория)</option>
+                        {categories.filter(c => c.level === 0).map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <Label htmlFor="cat-desc">Описание</Label>
