@@ -48,6 +48,10 @@ export default function AdminPage() {
     seller_id: ''
   });
 
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreview, setImagePreview] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
+
   const [settingsForm, setSettingsForm] = useState({
     primary_color: '#00ff9d',
     secondary_color: '#0d1117',
