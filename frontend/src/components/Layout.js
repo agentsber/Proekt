@@ -24,9 +24,13 @@ export const Layout = ({ children }) => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-xl" style={{ fontFamily: 'Unbounded' }}>G</span>
+                <span className="text-black font-bold text-xl" style={{ fontFamily: 'Unbounded' }}>
+                  {siteSettings?.site_name?.charAt(0) || 'G'}
+                </span>
               </div>
-              <span className="text-xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="site-logo">GameHub</span>
+              <span className="text-xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="site-logo">
+                {siteSettings?.site_name || 'GameHub'}
+              </span>
             </Link>
 
             {/* Navigation */}
