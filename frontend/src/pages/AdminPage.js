@@ -17,6 +17,7 @@ export default function AdminPage() {
   const { token } = useContext(AuthContext);
   const { fetchSiteSettings } = useContext(SiteSettingsContext);
   const [stats, setStats] = useState(null);
+  const [advancedStats, setAdvancedStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
