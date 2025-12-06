@@ -340,6 +340,30 @@ export default function AdminPage() {
     setImagePreview(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Navigation links management
+  const addNavigationLink = (section) => {
+    setSettingsForm(prev => ({
+      ...prev,
+      [section]: [...prev[section], { title: '', url: '' }]
+    }));
+  };
+
+  const updateNavigationLink = (section, index, field, value) => {
+    setSettingsForm(prev => ({
+      ...prev,
+      [section]: prev[section].map((link, i) => 
+        i === index ? { ...link, [field]: value } : link
+      )
+    }));
+  };
+
+  const removeNavigationLink = (section, index) => {
+    setSettingsForm(prev => ({
+      ...prev,
+      [section]: prev[section].filter((_, i) => i !== index)
+    }));
+  };
+
   // Site Settings Management
   const handleSaveSettings = async (e) => {
     e.preventDefault();
