@@ -87,6 +87,7 @@ export default function AdminPage() {
 
   const fetchAll = () => {
     fetchStats();
+    fetchAdvancedStats();
     fetchUsers();
     fetchProducts();
     fetchOrders();
