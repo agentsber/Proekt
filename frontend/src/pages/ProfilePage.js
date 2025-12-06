@@ -3,12 +3,13 @@ import axios from 'axios';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AuthContext, API } from '@/App';
+import { AuthContext, FavoritesContext, API } from '@/App';
 import { Package, Heart, Eye, User } from 'lucide-react';
 import { GameCard } from '@/components/GameCard';
 
 export default function ProfilePage() {
   const { user, token } = useContext(AuthContext);
+  const { fetchFavorites: refreshFavorites } = useContext(FavoritesContext);
   const [orders, setOrders] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [viewed, setViewed] = useState([]);
@@ -17,6 +18,15 @@ export default function ProfilePage() {
     fetchOrders();
     fetchFavorites();
     fetchViewed();
+  }, []);
+
+  // Re-fetch favorites when component mounts or favorites change in context
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchFavorites();
+    }, 2000); // Refresh every 2 seconds when on favorites tab
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchOrders = async () => {
