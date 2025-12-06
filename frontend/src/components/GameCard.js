@@ -53,7 +53,7 @@ export const GameCard = ({ product, onFavorite }) => {
 
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-[#00ff9d]" data-testid={`product-price-${product.id}`}>
-            ${product.price}
+            {formatPrice(product.price, currency)}
           </span>
           <div className="flex items-center space-x-3 text-xs text-[#8b949e]">
             <span className="flex items-center">
