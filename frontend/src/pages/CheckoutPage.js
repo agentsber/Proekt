@@ -84,7 +84,7 @@ export default function CheckoutPage() {
                         <p className="text-sm text-[#8b949e]">Количество: {item.quantity}</p>
                       </div>
                     </div>
-                    <span className="font-bold text-[#00ff9d]">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-bold text-[#00ff9d]">{formatPrice(item.price * item.quantity, currency)}</span>
                   </div>
                 ))}
               </div>
