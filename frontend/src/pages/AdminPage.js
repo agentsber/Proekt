@@ -615,6 +615,10 @@ export default function AdminPage() {
         {/* Tabs */}
         <Tabs defaultValue="users" className="w-full">
           <TabsList className="mb-8 flex-wrap">
+            <TabsTrigger value="analytics" data-testid="analytics-tab">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Аналитика
+            </TabsTrigger>
             <TabsTrigger value="users" data-testid="users-tab">
               <Users className="w-4 h-4 mr-2" />
               Пользователи
