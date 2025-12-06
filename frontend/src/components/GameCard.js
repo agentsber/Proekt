@@ -1,11 +1,30 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Eye } from 'lucide-react';
-import { CurrencyContext } from '@/App';
+import { CurrencyContext, FavoritesContext, AuthContext } from '@/App';
 import { formatPrice } from '@/utils/currency';
+import { toast } from 'sonner';
 
-export const GameCard = ({ product, onFavorite }) => {
+export const GameCard = ({ product }) => {
   const { currency } = useContext(CurrencyContext);
+  const { toggleFavorite, isFavorite: checkIsFavorite } = useContext(FavoritesContext);
+  const { user } = useContext(AuthContext);
+  
+  const isInFavorites = checkIsFavorite(product.id);
+
+  const handleFavoriteClick = async (e) => {
+    e.preventDefault();
+    try {
+      const added = await toggleFavorite(product.id);
+      if (added) {
+        toast.success('Добавлено в избранное');
+      } else {
+        toast.success('Удалено из избранного');
+      }
+    } catch (error) {
+      toast.error('Ошибка при работе с избранным');
+    }
+  };
 
   return (
     <Link
