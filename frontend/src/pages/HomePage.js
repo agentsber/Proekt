@@ -121,7 +121,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="featured-products-heading">
               Популярные товары
             </h2>
-            <Link to="/catalog" className="text-[#00ff9d] hover:text-[#00cc7d] flex items-center" data-testid="view-all-products-link">
+            <Link to="/catalog" className="text-primary hover:text-primary-hover flex items-center" data-testid="view-all-products-link">
               Смотреть все
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
