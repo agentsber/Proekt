@@ -100,13 +100,14 @@ export default function HomePage() {
               <Link
                 key={category.id}
                 to={`/catalog?category=${category.id}`}
-                className="glass-panel rounded-xl p-6 text-center hover:border-[#00ff9d] transition-all group"
+                className="glass-panel rounded-xl p-6 text-center transition-all group"
+                style={{ borderColor: 'var(--site-primary)' }}
                 data-testid={`category-${index}`}
               >
-                <div className="w-12 h-12 bg-[#00ff9d]/10 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-[#00ff9d] transition-colors">
+                <div className="w-12 h-12 bg-primary-10 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:bg-primary transition-colors">
                   <span className="text-2xl">🎮</span>
                 </div>
-                <h3 className="font-semibold group-hover:text-[#00ff9d] transition-colors">{category.name}</h3>
+                <h3 className="font-semibold group-hover:text-primary transition-colors">{category.name}</h3>
               </Link>
             ))}
           </div>
