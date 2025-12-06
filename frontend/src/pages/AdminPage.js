@@ -649,6 +649,160 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
 
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            {advancedStats ? (
+              <div className="space-y-6">
+                {/* Overview Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="glass-panel rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[#8b949e]">Всего пользователей</span>
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <p className="text-3xl font-bold">{advancedStats.overview.total_users}</p>
+                  </div>
+                  <div className="glass-panel rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[#8b949e]">Всего заказов</span>
+                      <ShoppingBag className="w-5 h-5 text-primary" />
+                    </div>
+                    <p className="text-3xl font-bold">{advancedStats.overview.total_orders}</p>
+                  </div>
+                  <div className="glass-panel rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[#8b949e]">Средний чек</span>
+                      <DollarSign className="w-5 h-5 text-primary" />
+                    </div>
+                    <p className="text-3xl font-bold">${advancedStats.overview.avg_order_value.toFixed(2)}</p>
+                  </div>
+                </div>
+
+                {/* Charts Row 1 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Revenue Chart */}
+                  <div className="glass-panel rounded-xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center">
+                      <LineChart className="w-5 h-5 mr-2 text-primary" />
+                      Доход за последние 7 дней
+                    </h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RechartsLine data={advancedStats.revenue_by_day}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
+                        <XAxis dataKey="date" stroke="#8b949e" />
+                        <YAxis stroke="#8b949e" />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#0d1117', border: '1px solid #30363d' }}
+                          labelStyle={{ color: '#ffffff' }}
+                        />
+                        <Line type="monotone" dataKey="revenue" stroke="var(--site-primary)" strokeWidth={2} />
+                      </RechartsLine>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Orders by Status Pie Chart */}
+                  <div className="glass-panel rounded-xl p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center">
+                      <PieChart className="w-5 h-5 mr-2 text-primary" />
+                      Заказы по статусам
+                    </h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RechartsPie>
+                        <Pie
+                          data={Object.keys(advancedStats.orders_by_status).map(key => ({
+                            name: key,
+                            value: advancedStats.orders_by_status[key]
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={(entry) => `${entry.name}: ${entry.value}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {Object.keys(advancedStats.orders_by_status).map((key, index) => (
+                            <Cell key={`cell-${index}`} fill={
+                              key === 'paid' ? '#00ff9d' : 
+                              key === 'completed' ? '#00cc7d' : 
+                              key === 'pending' ? '#ffbd00' : 
+                              '#ff6b6b'
+                            } />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#0d1117', border: '1px solid #30363d' }} />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Top Products */}
+                <div className="glass-panel rounded-xl p-6">
+                  <h3 className="text-lg font-bold mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                    Топ-5 товаров
+                  </h3>
+                  <div className="space-y-4">
+                    {advancedStats.top_products.map((product, index) => (
+                      <div key={product.id} className="flex items-center justify-between p-4 bg-[#0d1117] rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="font-bold text-primary">#{index + 1}</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold">{product.title}</p>
+                            <p className="text-sm text-[#8b949e]">Продано: {product.total_sold} шт.</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-primary">${product.revenue.toFixed(2)}</p>
+                          <p className="text-xs text-[#8b949e]">выручка</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Users by Role */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {Object.keys(advancedStats.users_by_role).map(role => (
+                    <div key={role} className="glass-panel rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[#8b949e] capitalize">{role}</span>
+                        <Users className="w-5 h-5 text-primary" />
+                      </div>
+                      <p className="text-3xl font-bold">{advancedStats.users_by_role[role]}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Categories Performance */}
+                <div className="glass-panel rounded-xl p-6">
+                  <h3 className="text-lg font-bold mb-4 flex items-center">
+                    <Package className="w-5 h-5 mr-2 text-primary" />
+                    Товары по категориям
+                  </h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={advancedStats.categories_performance}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
+                      <XAxis dataKey="name" stroke="#8b949e" />
+                      <YAxis stroke="#8b949e" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#0d1117', border: '1px solid #30363d' }}
+                        labelStyle={{ color: '#ffffff' }}
+                      />
+                      <Bar dataKey="products_count" fill="var(--site-primary)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-primary text-xl">Загрузка аналитики...</div>
+              </div>
+            )}
+          </TabsContent>
+
           {/* Users Tab */}
           <TabsContent value="users">
             <div className="glass-panel rounded-xl overflow-hidden">
