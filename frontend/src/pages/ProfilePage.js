@@ -222,18 +222,16 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="flex flex-col space-y-2">
-              {(user?.role === 'seller' || user?.role === 'admin') && (
-                <Button
-                  onClick={() => window.location.href = '/seller-dashboard'}
-                  className="skew-button bg-primary hover:bg-primary-hover text-black"
-                  data-testid="manage-products-button"
-                >
-                  <span className="flex items-center">
-                    <Package className="w-5 h-5 mr-2" />
-                    Управление товарами
-                  </span>
-                </Button>
-              )}
+              <Button
+                onClick={() => window.location.href = '/seller-dashboard'}
+                className="skew-button bg-primary hover:bg-primary-hover text-black"
+                data-testid="manage-products-button"
+              >
+                <span className="flex items-center">
+                  <Package className="w-5 h-5 mr-2" />
+                  Мои товары
+                </span>
+              </Button>
               {!user?.telegram_id ? (
                 <Button
                   onClick={() => setTelegramModalOpen(true)}
