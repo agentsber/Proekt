@@ -24,6 +24,9 @@ export default function ProfilePage() {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [loading, setLoading] = useState(false);
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false);
+  const [telegramCode, setTelegramCode] = useState('');
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     fetchOrders();
