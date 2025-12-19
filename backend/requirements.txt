@@ -39,7 +39,7 @@ h11==0.16.0
 hf-xet==1.2.0
 httpcore==1.0.9
 httplib2==0.31.0
-httpx==0.28.1
+httpx==0.25.2
 huggingface_hub==1.2.1
 idna==3.11
 importlib_metadata==8.7.0
@@ -89,6 +89,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 python-jose==3.5.0
 python-multipart==0.0.20
+python-telegram-bot==20.7
 pytokens==0.3.0
 pytz==2025.2
 PyYAML==6.0.3
