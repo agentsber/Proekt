@@ -362,108 +362,87 @@ async def get_me(user: dict = Depends(get_current_user)):
     return User(**user)
 
 # === Telegram Auth Routes ===
-@api_router.post("/auth/telegram/generate-code")
-async def generate_telegram_code(user: dict = Depends(get_current_user)):
-    """Generate a verification code for linking Telegram account"""
-    code = str(uuid.uuid4())[:8].upper()  # 8-char code
+@api_router.post("/auth/telegram/widget", response_model=TokenResponse)
+async def telegram_widget_auth(
+    id: int,
+    first_name: str,
+    username: Optional[str] = None,
+    photo_url: Optional[str] = None,
+    auth_date: Optional[int] = None,
+    hash: Optional[str] = None
+):
+    """
+    Authenticate via Telegram Login Widget
+    Simplified flow: auto-register if new user, login if exists
+    """
+    telegram_id = id
     
-    # Store code with user_id and expiration (10 minutes)
-    await db.telegram_codes.insert_one({
-        "code": code,
-        "user_id": user["id"],
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
-        "used": False
-    })
-    
-    return {"code": code, "expires_in": 600}
-
-@api_router.post("/auth/telegram/link")
-async def link_telegram_account(request: TelegramAuthRequest):
-    """Link Telegram account using verification code"""
-    # Find code
-    code_doc = await db.telegram_codes.find_one({"code": request.code, "used": False}, {"_id": 0})
-    
-    if not code_doc:
-        raise HTTPException(status_code=400, detail="Invalid or expired code")
-    
-    # Check expiration
-    expires_at = datetime.fromisoformat(code_doc["expires_at"])
-    if datetime.now(timezone.utc) > expires_at:
-        raise HTTPException(status_code=400, detail="Code expired")
-    
-    # Update user with Telegram info
-    await db.users.update_one(
-        {"id": code_doc["user_id"]},
-        {"$set": {
-            "telegram_id": request.telegram_id,
-            "telegram_username": request.telegram_username
-        }}
-    )
-    
-    # Mark code as used
-    await db.telegram_codes.update_one(
-        {"code": request.code},
-        {"$set": {"used": True}}
-    )
-    
-    return {"message": "Telegram account linked successfully"}
-
-@api_router.post("/auth/telegram/login", response_model=TokenResponse)
-async def telegram_login(telegram_id: int):
-    """Login using Telegram ID"""
+    # Check if user exists
     user = await db.users.find_one({"telegram_id": telegram_id}, {"_id": 0})
     
-    if not user:
-        raise HTTPException(status_code=404, detail="No account linked to this Telegram")
-    
-    # Create JWT token
-    access_token = create_access_token(data={"sub": user["email"]})
-    user["created_at"] = datetime.fromisoformat(user["created_at"])
-    
-    return TokenResponse(access_token=access_token, user=User(**user))
+    if user:
+        # Existing user - login
+        access_token = create_access_token(data={"sub": user["email"]})
+        user["created_at"] = datetime.fromisoformat(user["created_at"])
+        return TokenResponse(access_token=access_token, user=User(**user))
+    else:
+        # New user - auto-register
+        # Generate email from telegram
+        email = f"telegram_{telegram_id}@gamehub.temp"
+        
+        # Check if this temp email exists (shouldn't happen)
+        existing = await db.users.find_one({"email": email})
+        if existing:
+            # Login with existing account
+            access_token = create_access_token(data={"sub": existing["email"]})
+            existing["created_at"] = datetime.fromisoformat(existing["created_at"])
+            return TokenResponse(access_token=access_token, user=User(**existing))
+        
+        # Create new user
+        user_id = str(uuid.uuid4())
+        new_user = {
+            "id": user_id,
+            "email": email,
+            "password_hash": "",  # No password for Telegram auth
+            "full_name": first_name,
+            "role": "buyer",
+            "avatar": photo_url,
+            "balance": 0.0,
+            "telegram_id": telegram_id,
+            "telegram_username": username,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.users.insert_one(new_user)
+        
+        # Create JWT token
+        access_token = create_access_token(data={"sub": email})
+        new_user["created_at"] = datetime.fromisoformat(new_user["created_at"])
+        
+        return TokenResponse(access_token=access_token, user=User(**new_user))
 
-@api_router.post("/auth/telegram/register", response_model=TokenResponse)
-async def telegram_register(
-    full_name: str,
-    email: str,
-    telegram_id: int,
-    telegram_username: Optional[str] = None,
-    role: str = "buyer"
+@api_router.post("/auth/telegram/update-email")
+async def update_telegram_user_email(
+    new_email: str,
+    user: dict = Depends(get_current_user)
 ):
-    """Register new user via Telegram"""
-    # Check if email already exists
-    existing_user = await db.users.find_one({"email": email})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+    """Update email for Telegram-registered user"""
+    # Check if user has telegram auth
+    if not user.get("telegram_id"):
+        raise HTTPException(status_code=400, detail="Not a Telegram account")
     
-    # Check if telegram_id already linked
-    existing_telegram = await db.users.find_one({"telegram_id": telegram_id})
-    if existing_telegram:
-        raise HTTPException(status_code=400, detail="Telegram account already linked")
+    # Check if new email already exists
+    existing = await db.users.find_one({"email": new_email})
+    if existing and existing["id"] != user["id"]:
+        raise HTTPException(status_code=400, detail="Email already in use")
     
-    # Create user
-    user_id = str(uuid.uuid4())
-    user = {
-        "id": user_id,
-        "email": email,
-        "password_hash": "",  # No password for Telegram auth
-        "full_name": full_name,
-        "role": role,
-        "avatar": None,
-        "balance": 0.0,
-        "telegram_id": telegram_id,
-        "telegram_username": telegram_username,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
+    # Update email
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"email": new_email}}
+    )
     
-    await db.users.insert_one(user)
-    
-    # Create JWT token
-    access_token = create_access_token(data={"sub": email})
-    user["created_at"] = datetime.fromisoformat(user["created_at"])
-    
-    return TokenResponse(access_token=access_token, user=User(**user))
+    return {"message": "Email updated successfully"}
 
 # === Balance & Transactions Routes ===
 @api_router.get("/balance")
