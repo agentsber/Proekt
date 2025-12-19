@@ -214,6 +214,17 @@ class WithdrawalRequest(BaseModel):
     method: str = "bank_transfer"
     account_details: Optional[str] = None
 
+# === Telegram Auth Models ===
+class TelegramAuthRequest(BaseModel):
+    code: str  # Verification code
+    telegram_id: int
+    telegram_username: Optional[str] = None
+
+class TelegramLinkRequest(BaseModel):
+    code: str
+    email: str
+    password: str
+
 # === Helper Functions ===
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
