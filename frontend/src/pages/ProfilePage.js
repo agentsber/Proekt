@@ -147,6 +147,28 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLinkTelegram = async () => {
+    try {
+      const response = await axios.post(`${API}/auth/telegram/generate-code`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTelegramCode(response.data.code);
+      setTelegramModalOpen(true);
+      toast.success('Код сгенерирован! Отправьте его боту в Telegram.');
+    } catch (error) {
+      toast.error('Ошибка генерации кода');
+    }
+  };
+
+  const copyCode = () => {
+    if (telegramCode) {
+      navigator.clipboard.writeText(telegramCode);
+      setCodeCopied(true);
+      toast.success('Код скопирован!');
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
