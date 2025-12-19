@@ -361,6 +361,110 @@ async def get_me(user: dict = Depends(get_current_user)):
     user["created_at"] = datetime.fromisoformat(user["created_at"])
     return User(**user)
 
+# === Telegram Auth Routes ===
+@api_router.post("/auth/telegram/generate-code")
+async def generate_telegram_code(user: dict = Depends(get_current_user)):
+    """Generate a verification code for linking Telegram account"""
+    code = str(uuid.uuid4())[:8].upper()  # 8-char code
+    
+    # Store code with user_id and expiration (10 minutes)
+    await db.telegram_codes.insert_one({
+        "code": code,
+        "user_id": user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+        "used": False
+    })
+    
+    return {"code": code, "expires_in": 600}
+
+@api_router.post("/auth/telegram/link")
+async def link_telegram_account(request: TelegramAuthRequest):
+    """Link Telegram account using verification code"""
+    # Find code
+    code_doc = await db.telegram_codes.find_one({"code": request.code, "used": False}, {"_id": 0})
+    
+    if not code_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(code_doc["expires_at"])
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Code expired")
+    
+    # Update user with Telegram info
+    await db.users.update_one(
+        {"id": code_doc["user_id"]},
+        {"$set": {
+            "telegram_id": request.telegram_id,
+            "telegram_username": request.telegram_username
+        }}
+    )
+    
+    # Mark code as used
+    await db.telegram_codes.update_one(
+        {"code": request.code},
+        {"$set": {"used": True}}
+    )
+    
+    return {"message": "Telegram account linked successfully"}
+
+@api_router.post("/auth/telegram/login", response_model=TokenResponse)
+async def telegram_login(telegram_id: int):
+    """Login using Telegram ID"""
+    user = await db.users.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="No account linked to this Telegram")
+    
+    # Create JWT token
+    access_token = create_access_token(data={"sub": user["email"]})
+    user["created_at"] = datetime.fromisoformat(user["created_at"])
+    
+    return TokenResponse(access_token=access_token, user=User(**user))
+
+@api_router.post("/auth/telegram/register", response_model=TokenResponse)
+async def telegram_register(
+    full_name: str,
+    email: str,
+    telegram_id: int,
+    telegram_username: Optional[str] = None,
+    role: str = "buyer"
+):
+    """Register new user via Telegram"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Check if telegram_id already linked
+    existing_telegram = await db.users.find_one({"telegram_id": telegram_id})
+    if existing_telegram:
+        raise HTTPException(status_code=400, detail="Telegram account already linked")
+    
+    # Create user
+    user_id = str(uuid.uuid4())
+    user = {
+        "id": user_id,
+        "email": email,
+        "password_hash": "",  # No password for Telegram auth
+        "full_name": full_name,
+        "role": role,
+        "avatar": None,
+        "balance": 0.0,
+        "telegram_id": telegram_id,
+        "telegram_username": telegram_username,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.insert_one(user)
+    
+    # Create JWT token
+    access_token = create_access_token(data={"sub": email})
+    user["created_at"] = datetime.fromisoformat(user["created_at"])
+    
+    return TokenResponse(access_token=access_token, user=User(**user))
+
 # === Balance & Transactions Routes ===
 @api_router.get("/balance")
 async def get_balance(user: dict = Depends(get_current_user)):
