@@ -94,10 +94,13 @@ export const Layout = ({ children }) => {
 
         {/* Chats */}
         {user && (
-          <button className="flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all text-[#8b949e] hover:text-white">
+          <Link
+            to="/chats"
+            className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname.startsWith('/chats') ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+          >
             <MessageCircle className="w-5 h-5" />
             <span className="text-[9px] mt-0.5">Чаты</span>
-          </button>
+          </Link>
         )}
 
         {/* Profile */}
