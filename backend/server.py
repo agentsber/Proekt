@@ -67,6 +67,8 @@ class User(BaseModel):
     role: str
     avatar: Optional[str] = None
     balance: float = 0.0
+    telegram_id: Optional[int] = None
+    telegram_username: Optional[str] = None
     created_at: datetime
 
 class TokenResponse(BaseModel):
