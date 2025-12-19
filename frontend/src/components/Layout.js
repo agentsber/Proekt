@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Settings, Search, Menu, X, Loader2 } from 'lucide-react';
-import { AuthContext, CartContext, CurrencyContext, SiteSettingsContext } from '@/App';
+import { AuthContext, CartContext, SiteSettingsContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import axios from 'axios';
