@@ -257,6 +257,19 @@ export default function ProfilePage() {
                   </span>
                 </Button>
               )}
+              <Button
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
+                variant="outline"
+                className="skew-button border-[#30363d] hover:bg-[#161b22]"
+              >
+                <span className="flex items-center">
+                  <LogOut className="w-5 h-5 mr-2" />
+                  Выйти
+                </span>
+              </Button>
             </div>
           </div>
         </div>
