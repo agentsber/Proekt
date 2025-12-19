@@ -57,6 +57,42 @@ export default function AuthPage() {
     }
   };
 
+  // Check for Telegram callback
+  useEffect(() => {
+    const telegramId = searchParams.get('telegram_id');
+    if (telegramId) {
+      handleTelegramLogin(parseInt(telegramId));
+    }
+  }, [searchParams]);
+
+  const handleTelegramLogin = async (telegramId) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/auth/telegram/login?telegram_id=${telegramId}`);
+      login(response.data.access_token, response.data.user);
+      toast.success('Вход через Telegram успешен!');
+      navigate('/profile');
+    } catch (error) {
+      toast.error('Аккаунт не привязан к Telegram. Пожалуйста, зарегистрируйтесь или привяжите аккаунт в профиле.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTelegramAuth = () => {
+    toast.info('Откройте Telegram бота @YourGameHubBot и следуйте инструкциям');
+    setTelegramModalOpen(true);
+  };
+
+  const copyCode = () => {
+    if (telegramCode) {
+      navigator.clipboard.writeText(telegramCode);
+      setCodeCopied(true);
+      toast.success('Код скопирован!');
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-[80vh] flex items-center justify-center py-16">
