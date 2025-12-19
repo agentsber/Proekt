@@ -393,7 +393,9 @@ export default function AdminPage() {
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm('Удалить эту категорию?')) return;
+    const confirmed = window.confirm('Удалить эту категорию?');
+    if (!confirmed) return;
+    
     try {
       await axios.delete(`${API}/categories/${categoryId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -401,7 +403,27 @@ export default function AdminPage() {
       toast.success('Категория удалена');
       fetchCategories();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Ошибка удаления');
+      const errorMsg = error.response?.data?.detail || 'Ошибка удаления';
+      
+      // If category has products/subcategories, offer force delete
+      if (errorMsg.includes('товарами') || errorMsg.includes('подкатегориями')) {
+        const forceConfirm = window.confirm(
+          `${errorMsg}\n\nУдалить принудительно? (товары/подкатегории потеряют связь с этой категорией)`
+        );
+        if (forceConfirm) {
+          try {
+            await axios.delete(`${API}/categories/${categoryId}?force=true`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('Категория удалена');
+            fetchCategories();
+          } catch (err) {
+            toast.error(err.response?.data?.detail || 'Ошибка удаления');
+          }
+        }
+      } else {
+        toast.error(errorMsg);
+      }
     }
   };
 
