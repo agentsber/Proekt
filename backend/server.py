@@ -78,7 +78,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     full_name: str
-    role: str = "buyer"  # buyer, seller, admin
+    role: str = "user"  # user, admin
 
 class UserLogin(BaseModel):
     email: EmailStr
