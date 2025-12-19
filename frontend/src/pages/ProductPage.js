@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Layout } from '@/components/Layout';
 import { GameCard } from '@/components/GameCard';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Heart, Eye, Package } from 'lucide-react';
+import { ShoppingCart, Heart, Eye, Package, MessageCircle } from 'lucide-react';
 import { AuthContext, CartContext, CurrencyContext, API } from '@/App';
 import { toast } from 'sonner';
 import { formatPrice } from '@/utils/currency';
