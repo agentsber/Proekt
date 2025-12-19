@@ -81,7 +81,17 @@ export default function AdminPage() {
     footer_legal: [
       { title: 'Условия использования', url: '#' },
       { title: 'Политика конфиденциальности', url: '#' }
-    ]
+    ],
+    // SEO Settings
+    seo_title: '',
+    seo_description: '',
+    seo_keywords: '',
+    og_image: '',
+    favicon_url: '',
+    google_analytics_id: '',
+    yandex_metrika_id: '',
+    robots_txt: '',
+    custom_head_scripts: ''
   });
 
   const [blogForm, setBlogForm] = useState({
