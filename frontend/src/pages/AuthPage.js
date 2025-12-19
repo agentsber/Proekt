@@ -225,6 +225,59 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Telegram Auth Modal */}
+      {telegramModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setTelegramModalOpen(false)}>
+          <div className="glass-panel rounded-xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-center mb-6">
+              <MessageCircle className="w-12 h-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ fontFamily: 'Unbounded' }}>
+              Вход через Telegram
+            </h2>
+            
+            <div className="space-y-4 mb-6">
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <p className="text-sm text-[#8b949e] mb-2">Шаг 1:</p>
+                <p className="font-semibold">Откройте бота в Telegram</p>
+                <a 
+                  href="https://t.me/YourGameHubBot" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary-hover text-sm mt-2 inline-block"
+                >
+                  @YourGameHubBot →
+                </a>
+              </div>
+
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <p className="text-sm text-[#8b949e] mb-2">Шаг 2:</p>
+                <p className="font-semibold mb-2">Для новых пользователей:</p>
+                <p className="text-sm text-[#8b949e]">Отправьте боту:</p>
+                <code className="block bg-[#161b22] p-2 rounded mt-2 text-xs">
+                  Имя Фамилия | email@example.com
+                </code>
+              </div>
+
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <p className="text-sm text-[#8b949e] mb-2">Шаг 3:</p>
+                <p className="font-semibold mb-2">Для существующих пользователей:</p>
+                <p className="text-sm text-[#8b949e]">
+                  Войдите на сайт, перейдите в профиль, получите код привязки и отправьте его боту
+                </p>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setTelegramModalOpen(false)}
+              className="w-full skew-button bg-primary hover:bg-primary-hover text-black"
+            >
+              <span>Понятно</span>
+            </Button>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
