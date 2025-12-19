@@ -1256,6 +1256,26 @@ async def send_message(chat_id: str, data: ChatMessageCreate, user: dict = Depen
         {"$set": {"last_message": data.content, "last_message_at": now}}
     )
     
+    # Send Telegram notification to recipient
+    recipient_id = chat["seller_id"] if chat["buyer_id"] == user["id"] else chat["buyer_id"]
+    recipient = await db.users.find_one({"id": recipient_id}, {"_id": 0})
+    
+    if recipient and recipient.get("telegram_id"):
+        # Get product info if exists
+        product_name = ""
+        if chat.get("product_id"):
+            product = await db.products.find_one({"id": chat["product_id"]}, {"_id": 0})
+            if product:
+                product_name = f"\n📦 Товар: {product['title']}"
+        
+        await send_telegram_notification(
+            recipient["telegram_id"],
+            f"💬 <b>Новое сообщение!</b>\n\n"
+            f"👤 От: {user.get('full_name', 'Пользователь')}{product_name}\n\n"
+            f"📝 {data.content[:200]}{'...' if len(data.content) > 200 else ''}\n\n"
+            f"<a href='{os.environ.get('FRONTEND_URL', '')}/chats/{chat_id}'>Открыть чат</a>"
+        )
+    
     # Return without _id
     message.pop("_id", None)
     return message
