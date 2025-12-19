@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,16 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthContext, API } from '@/App';
 import { toast } from 'sonner';
+import { MessageCircle, Copy, CheckCircle } from 'lucide-react';
 
 export default function AuthPage() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false);
+  const [telegramCode, setTelegramCode] = useState('');
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({
