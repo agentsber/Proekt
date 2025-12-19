@@ -1524,7 +1524,16 @@ async def get_site_settings(user: dict = Depends(require_admin)):
             "footer_legal": [
                 {"title": "Условия использования", "url": "#"},
                 {"title": "Политика конфиденциальности", "url": "#"}
-            ]
+            ],
+            "seo_title": None,
+            "seo_description": None,
+            "seo_keywords": None,
+            "og_image": None,
+            "favicon_url": None,
+            "google_analytics_id": None,
+            "yandex_metrika_id": None,
+            "robots_txt": None,
+            "custom_head_scripts": None
         }
         await db.site_settings.insert_one(default_settings)
         return default_settings
