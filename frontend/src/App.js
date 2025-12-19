@@ -43,7 +43,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [cart, setCart] = useState([]);
-  const [currency, setCurrency] = useState('usd');
+  const [currency, setCurrency] = useState('rub');
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [siteSettings, setSiteSettings] = useState({
