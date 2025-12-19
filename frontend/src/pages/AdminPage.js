@@ -206,6 +206,74 @@ export default function AdminPage() {
     }
   };
 
+  const fetchBlogPosts = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/blog`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBlogPosts(response.data);
+    } catch (error) {
+      console.error('Failed to fetch blog posts:', error);
+    }
+  };
+
+  // Blog Management
+  const handleSaveBlogPost = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingBlogPost) {
+        await axios.put(`${API}/blog/${editingBlogPost.id}`, blogForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Статья обновлена!');
+      } else {
+        await axios.post(`${API}/blog`, blogForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Статья создана!');
+      }
+      setShowBlogDialog(false);
+      setEditingBlogPost(null);
+      resetBlogForm();
+      fetchBlogPosts();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Ошибка сохранения');
+    }
+  };
+
+  const handleDeleteBlogPost = async (postId) => {
+    if (!window.confirm('Удалить эту статью?')) return;
+    try {
+      await axios.delete(`${API}/blog/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Статья удалена');
+      fetchBlogPosts();
+    } catch (error) {
+      toast.error('Ошибка удаления');
+    }
+  };
+
+  const handleEditBlogPost = (post) => {
+    setEditingBlogPost(post);
+    setBlogForm({
+      title: post.title,
+      slug: post.slug,
+      content: post.content,
+      image: post.image || ''
+    });
+    setShowBlogDialog(true);
+  };
+
+  const resetBlogForm = () => {
+    setBlogForm({
+      title: '',
+      slug: '',
+      content: '',
+      image: ''
+    });
+  };
+
   // User Management
   const handleUpdateUserRole = async (userId, newRole) => {
     try {
