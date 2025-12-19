@@ -25,12 +25,15 @@ export default function AdminPage() {
   const [siteSettings, setSiteSettings] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [giveaways, setGiveaways] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
   
   // Dialogs
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [showProductDialog, setShowProductDialog] = useState(false);
+  const [showBlogDialog, setShowBlogDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [editingBlogPost, setEditingBlogPost] = useState(null);
 
   // Forms
   const [categoryForm, setCategoryForm] = useState({
