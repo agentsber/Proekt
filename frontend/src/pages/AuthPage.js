@@ -20,7 +20,7 @@ export default function AuthPage() {
     email: '',
     password: '',
     full_name: '',
-    role: 'buyer'
+    role: 'user'
   });
 
   const handleLogin = async (e) => {
