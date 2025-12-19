@@ -19,6 +19,7 @@ import BlogPage from '@/pages/BlogPage';
 import BlogPostPage from '@/pages/BlogPostPage';
 import AdminPage from '@/pages/AdminPage';
 import CheckoutSuccessPage from '@/pages/CheckoutSuccessPage';
+import TelegramAuthPage from '@/pages/TelegramAuthPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
