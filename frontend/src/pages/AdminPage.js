@@ -1970,6 +1970,139 @@ export default function AdminPage() {
               )}
             </div>
           </TabsContent>
+
+          {/* SEO Tab */}
+          <TabsContent value="seo">
+            <div className="glass-panel rounded-xl p-8">
+              <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'Unbounded' }}>
+                SEO настройки
+              </h2>
+              <form onSubmit={handleSaveSettings} className="space-y-6">
+                {/* Meta Tags */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-primary">Мета-теги</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="seo-title">SEO Title</Label>
+                      <Input
+                        id="seo-title"
+                        value={settingsForm.seo_title || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, seo_title: e.target.value })}
+                        placeholder="Заголовок для поисковиков"
+                      />
+                      <p className="text-xs text-[#8b949e] mt-1">Рекомендуется до 60 символов</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="seo-keywords">Ключевые слова</Label>
+                      <Input
+                        id="seo-keywords"
+                        value={settingsForm.seo_keywords || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, seo_keywords: e.target.value })}
+                        placeholder="игры, ключи, steam, магазин"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="seo-description">SEO Description</Label>
+                    <Textarea
+                      id="seo-description"
+                      value={settingsForm.seo_description || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, seo_description: e.target.value })}
+                      placeholder="Описание сайта для поисковиков"
+                      rows={3}
+                    />
+                    <p className="text-xs text-[#8b949e] mt-1">Рекомендуется до 160 символов</p>
+                  </div>
+                </div>
+
+                {/* Open Graph */}
+                <div className="space-y-4 pt-6 border-t border-[#30363d]">
+                  <h3 className="text-lg font-semibold text-primary">Open Graph (соц. сети)</h3>
+                  <div>
+                    <Label htmlFor="og-image">OG Image URL</Label>
+                    <Input
+                      id="og-image"
+                      value={settingsForm.og_image || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, og_image: e.target.value })}
+                      placeholder="https://example.com/og-image.jpg"
+                    />
+                    <p className="text-xs text-[#8b949e] mt-1">Изображение для предпросмотра в соц. сетях (1200x630px)</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="favicon-url">Favicon URL</Label>
+                    <Input
+                      id="favicon-url"
+                      value={settingsForm.favicon_url || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, favicon_url: e.target.value })}
+                      placeholder="https://example.com/favicon.ico"
+                    />
+                  </div>
+                </div>
+
+                {/* Analytics */}
+                <div className="space-y-4 pt-6 border-t border-[#30363d]">
+                  <h3 className="text-lg font-semibold text-primary">Аналитика</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="ga-id">Google Analytics ID</Label>
+                      <Input
+                        id="ga-id"
+                        value={settingsForm.google_analytics_id || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, google_analytics_id: e.target.value })}
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ym-id">Яндекс.Метрика ID</Label>
+                      <Input
+                        id="ym-id"
+                        value={settingsForm.yandex_metrika_id || ''}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, yandex_metrika_id: e.target.value })}
+                        placeholder="12345678"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Advanced */}
+                <div className="space-y-4 pt-6 border-t border-[#30363d]">
+                  <h3 className="text-lg font-semibold text-primary">Дополнительно</h3>
+                  <div>
+                    <Label htmlFor="robots-txt">robots.txt</Label>
+                    <Textarea
+                      id="robots-txt"
+                      value={settingsForm.robots_txt || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, robots_txt: e.target.value })}
+                      placeholder="User-agent: *&#10;Allow: /"
+                      rows={4}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="custom-scripts">Пользовательские скрипты (head)</Label>
+                    <Textarea
+                      id="custom-scripts"
+                      value={settingsForm.custom_head_scripts || ''}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, custom_head_scripts: e.target.value })}
+                      placeholder="<!-- Вставьте скрипты сюда -->"
+                      rows={4}
+                      className="font-mono text-sm"
+                    />
+                    <p className="text-xs text-[#8b949e] mt-1">Будут добавлены в &lt;head&gt; сайта</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button
+                    type="submit"
+                    className="skew-button bg-primary hover:bg-primary-hover text-black px-8"
+                  >
+                    <span>Сохранить SEO настройки</span>
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
