@@ -61,9 +61,124 @@ export const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="sticky top-0 z-50 glass-panel border-b border-[#30363d]">
+    <div className="min-h-screen flex">
+      {/* Left Sidebar - Steam Style */}
+      <aside className="fixed left-0 top-0 h-full w-20 bg-[#0d1117] border-r border-[#30363d] z-40 flex flex-col items-center py-4">
+        {/* Logo */}
+        <Link to="/" className="mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-xl flex items-center justify-center hover:scale-105 transition-transform">
+            <span className="text-black font-bold text-xl" style={{ fontFamily: 'Unbounded' }}>
+              {siteSettings?.site_name?.charAt(0) || 'G'}
+            </span>
+          </div>
+        </Link>
+
+        {/* Navigation Items */}
+        <nav className="flex-1 flex flex-col items-center space-y-2">
+          {/* Home */}
+          <Link
+            to="/"
+            className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] ${location.pathname === '/' ? 'bg-[#161b22] text-primary' : 'text-[#8b949e]'}`}
+          >
+            <Home className="w-6 h-6" />
+            <span className="text-[10px] mt-1">Главная</span>
+          </Link>
+
+          {/* Sell / Add Product (for sellers) */}
+          {user && (user.role === 'seller' || user.role === 'admin') && (
+            <Link
+              to="/seller-dashboard"
+              className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] ${location.pathname === '/seller-dashboard' ? 'bg-[#161b22] text-primary' : 'text-[#8b949e]'}`}
+            >
+              <Plus className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Продать</span>
+            </Link>
+          )}
+
+          {/* Notifications */}
+          {user && (
+            <button
+              className="w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] text-[#8b949e] relative"
+            >
+              <Bell className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Увед.</span>
+            </button>
+          )}
+
+          {/* Chats */}
+          {user && (
+            <button
+              className="w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] text-[#8b949e]"
+            >
+              <MessageCircle className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Чаты</span>
+            </button>
+          )}
+
+          {/* Profile */}
+          {user && (
+            <Link
+              to="/profile"
+              className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] ${location.pathname === '/profile' ? 'bg-[#161b22] text-primary' : 'text-[#8b949e]'}`}
+            >
+              <User className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Профиль</span>
+            </Link>
+          )}
+
+          {/* Admin */}
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] ${location.pathname === '/admin' ? 'bg-[#161b22] text-primary' : 'text-[#8b949e]'}`}
+            >
+              <Settings className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Админ</span>
+            </Link>
+          )}
+        </nav>
+
+        {/* Bottom Section - Cart & Auth */}
+        <div className="flex flex-col items-center space-y-2 mt-auto">
+          {/* Cart */}
+          <button
+            onClick={() => navigate('/cart')}
+            className="w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] text-[#8b949e] relative"
+          >
+            <ShoppingCart className="w-6 h-6" />
+            {cartItemsCount > 0 && (
+              <span className="absolute top-1 right-1 bg-primary text-black text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {cartItemsCount}
+              </span>
+            )}
+            <span className="text-[10px] mt-1">Корзина</span>
+          </button>
+
+          {/* Login/Logout */}
+          {user ? (
+            <button
+              onClick={logout}
+              className="w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] text-[#8b949e]"
+            >
+              <LogOut className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Выход</span>
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all hover:bg-[#161b22] text-primary"
+            >
+              <User className="w-6 h-6" />
+              <span className="text-[10px] mt-1">Войти</span>
+            </Link>
+          )}
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 ml-20">
+        {/* Header */}
+        <header className="sticky top-0 z-30 glass-panel border-b border-[#30363d]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
