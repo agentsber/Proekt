@@ -231,6 +231,8 @@ function App() {
                     <Route path="/giveaways" element={<GiveawaysPage />} />
                     <Route path="/blog" element={<BlogPage />} />
                     <Route path="/blog/:slug" element={<BlogPostPage />} />
+                    <Route path="/chats" element={user ? <ChatsPage /> : <Navigate to="/auth" />} />
+                    <Route path="/chats/:chatId" element={user ? <ChatsPage /> : <Navigate to="/auth" />} />
                     <Route path="/admin" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/" />} />
                   </Routes>
                 </BrowserRouter>
