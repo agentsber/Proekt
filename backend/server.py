@@ -1524,22 +1524,35 @@ async def update_category(category_id: str, data: CategoryCreate, user: dict = D
     return Category(**updated)
 
 @api_router.delete("/categories/{category_id}")
-async def delete_category(category_id: str, user: dict = Depends(require_admin)):
+async def delete_category(category_id: str, force: bool = False, user: dict = Depends(require_admin)):
+    # Check if category exists
+    category = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    if not category:
+        raise HTTPException(status_code=404, detail="Категория не найдена")
+    
     # Check if category has products
     products_count = await db.products.count_documents({"category_id": category_id})
-    if products_count > 0:
-        raise HTTPException(status_code=400, detail=f"Cannot delete category with {products_count} products")
+    if products_count > 0 and not force:
+        raise HTTPException(status_code=400, detail=f"Нельзя удалить категорию с {products_count} товарами. Сначала удалите или переместите товары.")
     
     # Check if category has subcategories
     subcategories = await db.categories.count_documents({"parent_id": category_id})
-    if subcategories > 0:
-        raise HTTPException(status_code=400, detail=f"Cannot delete category with {subcategories} subcategories")
+    if subcategories > 0 and not force:
+        raise HTTPException(status_code=400, detail=f"Нельзя удалить категорию с {subcategories} подкатегориями. Сначала удалите подкатегории.")
+    
+    # If force delete, remove products category reference
+    if force and products_count > 0:
+        await db.products.update_many({"category_id": category_id}, {"$set": {"category_id": None}})
+    
+    # If force delete, remove subcategories parent reference
+    if force and subcategories > 0:
+        await db.categories.update_many({"parent_id": category_id}, {"$set": {"parent_id": None}})
     
     result = await db.categories.delete_one({"id": category_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail="Категория не найдена")
     
-    return {"message": "Category deleted successfully"}
+    return {"message": "Категория удалена"}
 
 # === Admin Site Settings ===
 class NavigationLink(BaseModel):
