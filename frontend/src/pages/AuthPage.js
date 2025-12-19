@@ -214,8 +214,16 @@ export default function AuthPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex flex-col items-center space-y-3">
                     <TelegramLoginButton onAuth={handleTelegramAuth} />
+                    <a 
+                      href="https://t.me/eplaysbot" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-[#8b949e] hover:text-primary transition-colors"
+                    >
+                      Или зарегистрируйтесь через бота @eplaysbot →
+                    </a>
                   </div>
                 </form>
               </TabsContent>
