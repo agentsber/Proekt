@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthContext, FavoritesContext, API } from '@/App';
-import { Package, Heart, Eye, User, Wallet, Plus, Minus, DollarSign, History, MessageCircle, X } from 'lucide-react';
+import { Package, Heart, Eye, User, Wallet, Plus, Minus, DollarSign, History, MessageCircle, X, LogOut } from 'lucide-react';
 import { GameCard } from '@/components/GameCard';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +13,8 @@ import { toast } from 'sonner';
 import { TelegramLoginButton } from '@/components/TelegramLoginButton';
 
 export default function ProfilePage() {
-  const { user, token, refreshUser } = useContext(AuthContext);
+  const { user, token, refreshUser, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [favoritesProducts, setFavoritesProducts] = useState([]);
   const [viewed, setViewed] = useState([]);
