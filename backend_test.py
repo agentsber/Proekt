@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 
 class GameHubAPITester:
-    def __init__(self, base_url="https://digishop-62.preview.emergentagent.com"):
+    def __init__(self, base_url="https://gamestore-24.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tokens = {}
