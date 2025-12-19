@@ -511,6 +511,71 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Telegram Link Modal */}
+      {telegramModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setTelegramModalOpen(false)}>
+          <div className="glass-panel rounded-xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-center mb-6">
+              <MessageCircle className="w-12 h-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ fontFamily: 'Unbounded' }}>
+              Привязка Telegram
+            </h2>
+            
+            <div className="space-y-4 mb-6">
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <p className="text-sm text-[#8b949e] mb-2">Ваш код для привязки:</p>
+                <div className="flex items-center justify-between bg-[#161b22] p-4 rounded-lg">
+                  <code className="text-2xl font-bold text-primary tracking-wider">
+                    {telegramCode}
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={copyCode}
+                    className="ml-4"
+                  >
+                    {codeCopied ? <Copy className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="bg-[#0d1117] rounded-lg p-4">
+                <p className="text-sm font-semibold mb-2">Инструкция:</p>
+                <ol className="text-sm text-[#8b949e] space-y-2 list-decimal list-inside">
+                  <li>Откройте бота @YourGameHubBot в Telegram</li>
+                  <li>Отправьте боту команду /start</li>
+                  <li>Отправьте код: <span className="text-primary font-mono">{telegramCode}</span></li>
+                  <li>Готово! Аккаунт привязан</li>
+                </ol>
+              </div>
+
+              <a 
+                href="https://t.me/YourGameHubBot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button className="w-full skew-button bg-primary hover:bg-primary-hover text-black">
+                  <span className="flex items-center justify-center">
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Открыть бота
+                  </span>
+                </Button>
+              </a>
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={() => setTelegramModalOpen(false)}
+              className="w-full"
+            >
+              Закрыть
+            </Button>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
