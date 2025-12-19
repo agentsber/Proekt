@@ -105,6 +105,7 @@ export default function AdminPage() {
     fetchSettings();
     fetchTransactions();
     fetchGiveaways();
+    fetchBlogPosts();
   };
 
   const fetchStats = async () => {
