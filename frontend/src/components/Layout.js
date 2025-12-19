@@ -73,8 +73,8 @@ export const Layout = ({ children }) => {
           <span className="text-[9px] mt-0.5">Главная</span>
         </Link>
 
-        {/* Sell / Add Product (for sellers) */}
-        {user && (user.role === 'seller' || user.role === 'admin') && (
+        {/* Sell / Add Product (for all users) */}
+        {user && (
           <Link
             to="/seller-dashboard"
             className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname === '/seller-dashboard' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
