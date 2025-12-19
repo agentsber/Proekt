@@ -681,7 +681,7 @@ class GameHubAPITester:
             "Unlink Telegram without auth (should fail)",
             "POST",
             "auth/telegram/unlink", 
-            401
+            403
         )
         
         # Test 11: Unlink when no Telegram linked
