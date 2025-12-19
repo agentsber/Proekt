@@ -634,7 +634,7 @@ class GameHubAPITester:
             "Link Telegram without auth (should fail)",
             "POST", 
             "auth/telegram/link",
-            401,
+            403,
             link_telegram_data
         )
         
