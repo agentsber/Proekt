@@ -94,18 +94,6 @@ export const Layout = ({ children }) => {
 
             {/* Right Side */}
             <div className="flex items-center space-x-4">
-              {/* Currency Selector */}
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger className="w-20" data-testid="currency-selector">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="usd">USD</SelectItem>
-                  <SelectItem value="eur">EUR</SelectItem>
-                  <SelectItem value="rub">RUB</SelectItem>
-                </SelectContent>
-              </Select>
-
               {/* Search Button */}
               <button
                 onClick={handleSearchOpen}
