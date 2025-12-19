@@ -22,6 +22,9 @@ import CheckoutSuccessPage from '@/pages/CheckoutSuccessPage';
 import TelegramAuthPage from '@/pages/TelegramAuthPage';
 import ChatsPage from '@/pages/ChatsPage';
 
+// Components
+import SEOHead from '@/components/SEOHead';
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
