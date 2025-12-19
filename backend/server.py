@@ -215,15 +215,14 @@ class WithdrawalRequest(BaseModel):
     account_details: Optional[str] = None
 
 # === Telegram Auth Models ===
-class TelegramAuthRequest(BaseModel):
-    code: str  # Verification code
-    telegram_id: int
-    telegram_username: Optional[str] = None
-
-class TelegramLinkRequest(BaseModel):
-    code: str
-    email: str
-    password: str
+class TelegramWidgetData(BaseModel):
+    id: int
+    first_name: str
+    last_name: Optional[str] = None
+    username: Optional[str] = None
+    photo_url: Optional[str] = None
+    auth_date: int
+    hash: str
 
 # === Helper Functions ===
 def hash_password(password: str) -> str:
