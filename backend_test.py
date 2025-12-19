@@ -510,6 +510,200 @@ class GameHubAPITester:
                 token=self.tokens['buyer']
             )
 
+    def generate_telegram_hash(self, data, bot_token):
+        """Generate valid Telegram hash for testing"""
+        # Remove hash from data if present
+        data_copy = data.copy()
+        data_copy.pop('hash', None)
+        
+        # Create data-check-string
+        data_check_arr = [f"{key}={value}" for key, value in sorted(data_copy.items())]
+        data_check_string = "\n".join(data_check_arr)
+        
+        # Create secret key from bot token
+        secret_key = hashlib.sha256(bot_token.encode()).digest()
+        
+        # Calculate hash
+        calculated_hash = hmac.new(
+            secret_key,
+            data_check_string.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        
+        return calculated_hash
+
+    def test_telegram_auth(self):
+        """Test Telegram authentication endpoints"""
+        print("\n📱 Testing Telegram Authentication...")
+        
+        # Bot token from backend .env (this should match the actual token)
+        bot_token = "8523882721:AAGSzBy9ow9BcsCWqBVNLVtkHHFmkkxtOtc"
+        
+        # Test 1: Valid Telegram widget authentication (new user)
+        current_time = int(time.time())
+        telegram_data = {
+            "id": 123456789,
+            "first_name": "John",
+            "last_name": "Doe", 
+            "username": "johndoe",
+            "photo_url": "https://t.me/i/userpic/320/johndoe.jpg",
+            "auth_date": current_time
+        }
+        
+        # Generate valid hash
+        valid_hash = self.generate_telegram_hash(telegram_data, bot_token)
+        telegram_data["hash"] = valid_hash
+        
+        success, response = self.run_test(
+            "Telegram widget auth (new user)",
+            "POST",
+            "auth/telegram/widget",
+            200,
+            telegram_data
+        )
+        
+        if success and 'access_token' in response:
+            self.tokens['telegram_user'] = response['access_token']
+            self.test_data['telegram_user'] = response['user']
+            print(f"  ✅ Created new Telegram user: {response['user']['full_name']}")
+        
+        # Test 2: Valid Telegram widget authentication (existing user)
+        success, response = self.run_test(
+            "Telegram widget auth (existing user)",
+            "POST", 
+            "auth/telegram/widget",
+            200,
+            telegram_data
+        )
+        
+        if success:
+            print(f"  ✅ Logged in existing Telegram user")
+        
+        # Test 3: Invalid hash
+        invalid_data = telegram_data.copy()
+        invalid_data["hash"] = "invalid_hash_12345"
+        
+        self.run_test(
+            "Telegram widget auth (invalid hash)",
+            "POST",
+            "auth/telegram/widget", 
+            401,
+            invalid_data
+        )
+        
+        # Test 4: Expired auth_date (older than 24 hours)
+        expired_data = telegram_data.copy()
+        expired_data["auth_date"] = current_time - 86401  # 24 hours + 1 second ago
+        expired_data["hash"] = self.generate_telegram_hash(expired_data, bot_token)
+        
+        self.run_test(
+            "Telegram widget auth (expired)",
+            "POST",
+            "auth/telegram/widget",
+            401,
+            expired_data
+        )
+        
+        # Test 5: Link Telegram to existing account (requires authentication)
+        if 'buyer' in self.tokens:
+            # Create new telegram data for linking
+            link_telegram_data = {
+                "id": 987654321,
+                "first_name": "Jane",
+                "last_name": "Smith",
+                "username": "janesmith", 
+                "auth_date": current_time
+            }
+            link_telegram_data["hash"] = self.generate_telegram_hash(link_telegram_data, bot_token)
+            
+            success, response = self.run_test(
+                "Link Telegram to existing account",
+                "POST",
+                "auth/telegram/link",
+                200,
+                link_telegram_data,
+                self.tokens['buyer']
+            )
+            
+            if success:
+                print(f"  ✅ Linked Telegram to buyer account")
+                self.test_data['buyer_has_telegram'] = True
+        
+        # Test 6: Link Telegram without authentication (should fail)
+        self.run_test(
+            "Link Telegram without auth (should fail)",
+            "POST", 
+            "auth/telegram/link",
+            401,
+            link_telegram_data
+        )
+        
+        # Test 7: Link Telegram with invalid hash
+        if 'buyer' in self.tokens:
+            invalid_link_data = link_telegram_data.copy()
+            invalid_link_data["hash"] = "invalid_hash"
+            
+            self.run_test(
+                "Link Telegram with invalid hash",
+                "POST",
+                "auth/telegram/link", 
+                401,
+                invalid_link_data,
+                self.tokens['buyer']
+            )
+        
+        # Test 8: Try to link already linked Telegram to another account
+        if 'seller' in self.tokens and self.test_data.get('buyer_has_telegram'):
+            self.run_test(
+                "Link already linked Telegram (should fail)",
+                "POST",
+                "auth/telegram/link",
+                400,
+                link_telegram_data,
+                self.tokens['seller']
+            )
+        
+        # Test 9: Unlink Telegram from account
+        if 'buyer' in self.tokens and self.test_data.get('buyer_has_telegram'):
+            success, response = self.run_test(
+                "Unlink Telegram from account",
+                "POST",
+                "auth/telegram/unlink",
+                200,
+                token=self.tokens['buyer']
+            )
+            
+            if success:
+                print(f"  ✅ Unlinked Telegram from buyer account")
+        
+        # Test 10: Unlink Telegram without authentication
+        self.run_test(
+            "Unlink Telegram without auth (should fail)",
+            "POST",
+            "auth/telegram/unlink", 
+            401
+        )
+        
+        # Test 11: Unlink when no Telegram linked
+        if 'admin' in self.tokens:
+            self.run_test(
+                "Unlink when no Telegram linked",
+                "POST",
+                "auth/telegram/unlink",
+                400,
+                token=self.tokens['admin']
+            )
+        
+        # Test 12: Try to unlink when user has no password (Telegram-only user)
+        if 'telegram_user' in self.tokens:
+            self.run_test(
+                "Unlink Telegram-only user (should fail)",
+                "POST", 
+                "auth/telegram/unlink",
+                400,
+                token=self.tokens['telegram_user']
+            )
+
     def run_all_tests(self):
         """Run all API tests"""
         print("🚀 Starting GameHub API Tests...")
