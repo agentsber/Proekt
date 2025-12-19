@@ -647,6 +647,10 @@ export default function AdminPage() {
               <Palette className="w-4 h-4 mr-2" />
               Дизайн
             </TabsTrigger>
+            <TabsTrigger value="blog" data-testid="blog-tab">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Блог
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
