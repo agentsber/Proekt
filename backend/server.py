@@ -1126,6 +1126,9 @@ async def create_or_get_chat(seller_id: str, product_id: Optional[str] = None, u
         "last_message_at": None
     }
     await db.chats.insert_one(chat)
+    
+    # Return without _id
+    del chat["_id"] if "_id" in chat else None
     return chat
 
 @api_router.get("/chats/{chat_id}")
