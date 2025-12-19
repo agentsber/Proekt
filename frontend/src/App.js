@@ -223,6 +223,7 @@ function App() {
                     <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/auth" />} />
                     <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
                     <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/profile" />} />
+                    <Route path="/auth/telegram" element={<TelegramAuthPage />} />
                     <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" />} />
                     <Route path="/seller-dashboard" element={user && user.role !== 'buyer' ? <SellerDashboard /> : <Navigate to="/auth" />} />
                     <Route path="/seller/:id" element={<SellerPage />} />
