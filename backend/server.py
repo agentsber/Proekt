@@ -14,6 +14,7 @@ from datetime import datetime, timezone, timedelta, timedelta
 import bcrypt
 import jwt
 import shutil
+import httpx
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 ROOT_DIR = Path(__file__).parent
@@ -28,6 +29,30 @@ db = client[os.environ['DB_NAME']]
 JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
 JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM', 'HS256')
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+# Telegram Bot Config
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+
+async def send_telegram_notification(telegram_id: int, message: str):
+    """Send notification to user via Telegram bot"""
+    if not TELEGRAM_BOT_TOKEN or not telegram_id:
+        return False
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+                json={
+                    "chat_id": telegram_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                },
+                timeout=10.0
+            )
+            return response.status_code == 200
+    except Exception as e:
+        logging.error(f"Failed to send Telegram notification: {e}")
+        return False
 
 # Stripe Config
 stripe_api_key = os.environ['STRIPE_API_KEY']
