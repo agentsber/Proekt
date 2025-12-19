@@ -195,6 +195,7 @@ export const Layout = ({ children }) => {
         <main>
           {children}
         </main>
+      </div>
 
       {/* Search Modal */}
       {searchOpen && (
