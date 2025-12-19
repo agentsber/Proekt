@@ -4,7 +4,7 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthContext, FavoritesContext, API } from '@/App';
-import { Package, Heart, Eye, User, Wallet, Plus, Minus, DollarSign, History } from 'lucide-react';
+import { Package, Heart, Eye, User, Wallet, Plus, Minus, DollarSign, History, MessageCircle, Copy } from 'lucide-react';
 import { GameCard } from '@/components/GameCard';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
