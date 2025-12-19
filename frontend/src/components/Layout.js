@@ -10,7 +10,6 @@ import { API } from '@/App';
 export const Layout = ({ children }) => {
   const { user, logout } = useContext(AuthContext);
   const { cart } = useContext(CartContext);
-  const { currency, setCurrency } = useContext(CurrencyContext);
   const { siteSettings } = useContext(SiteSettingsContext);
   const navigate = useNavigate();
 
