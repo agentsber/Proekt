@@ -2,6 +2,9 @@ import requests
 import sys
 from datetime import datetime
 import json
+import hashlib
+import hmac
+import time
 
 class GameHubAPITester:
     def __init__(self, base_url="https://gamestore-24.preview.emergentagent.com"):
