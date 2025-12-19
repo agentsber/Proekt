@@ -361,87 +361,166 @@ async def get_me(user: dict = Depends(get_current_user)):
     return User(**user)
 
 # === Telegram Auth Routes ===
+import hashlib
+import hmac
+
+def verify_telegram_auth(data: dict, bot_token: str) -> bool:
+    """Verify the authentication data from Telegram Login Widget"""
+    check_hash = data.pop('hash', None)
+    if not check_hash:
+        return False
+    
+    # Create data-check-string
+    data_check_arr = [f"{key}={value}" for key, value in sorted(data.items())]
+    data_check_string = "\n".join(data_check_arr)
+    
+    # Create secret key from bot token
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+    
+    # Calculate hash
+    calculated_hash = hmac.new(
+        secret_key,
+        data_check_string.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    
+    return calculated_hash == check_hash
+
 @api_router.post("/auth/telegram/widget", response_model=TokenResponse)
-async def telegram_widget_auth(
-    id: int,
-    first_name: str,
-    username: Optional[str] = None,
-    photo_url: Optional[str] = None,
-    auth_date: Optional[int] = None,
-    hash: Optional[str] = None
-):
+async def telegram_widget_auth(data: TelegramWidgetData):
     """
     Authenticate via Telegram Login Widget
-    Simplified flow: auto-register if new user, login if exists
+    Validates hash and auto-registers if new user
     """
-    telegram_id = id
+    bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    if not bot_token:
+        raise HTTPException(status_code=500, detail="Telegram bot token not configured")
+    
+    # Prepare data for verification
+    auth_data = {
+        "id": data.id,
+        "first_name": data.first_name,
+        "auth_date": data.auth_date,
+        "hash": data.hash
+    }
+    if data.last_name:
+        auth_data["last_name"] = data.last_name
+    if data.username:
+        auth_data["username"] = data.username
+    if data.photo_url:
+        auth_data["photo_url"] = data.photo_url
+    
+    # Verify the hash
+    if not verify_telegram_auth(auth_data.copy(), bot_token):
+        raise HTTPException(status_code=401, detail="Invalid Telegram auth data")
+    
+    # Check if auth_date is not too old (max 24 hours)
+    auth_time = datetime.fromtimestamp(data.auth_date, tz=timezone.utc)
+    if (datetime.now(timezone.utc) - auth_time).total_seconds() > 86400:
+        raise HTTPException(status_code=401, detail="Auth data expired")
+    
+    telegram_id = data.id
+    full_name = data.first_name
+    if data.last_name:
+        full_name += f" {data.last_name}"
     
     # Check if user exists
     user = await db.users.find_one({"telegram_id": telegram_id}, {"_id": 0})
     
     if user:
         # Existing user - login
-        access_token = create_access_token(data={"sub": user["email"]})
+        # Update telegram username if changed
+        if data.username and user.get("telegram_username") != data.username:
+            await db.users.update_one(
+                {"telegram_id": telegram_id},
+                {"$set": {"telegram_username": data.username}}
+            )
+            user["telegram_username"] = data.username
+        
+        access_token = create_access_token(data={"sub": user["id"]})
         user["created_at"] = datetime.fromisoformat(user["created_at"])
         return TokenResponse(access_token=access_token, user=User(**user))
     else:
         # New user - auto-register
-        # Generate email from telegram
-        email = f"telegram_{telegram_id}@gamehub.temp"
-        
-        # Check if this temp email exists (shouldn't happen)
-        existing = await db.users.find_one({"email": email})
-        if existing:
-            # Login with existing account
-            access_token = create_access_token(data={"sub": existing["email"]})
-            existing["created_at"] = datetime.fromisoformat(existing["created_at"])
-            return TokenResponse(access_token=access_token, user=User(**existing))
-        
-        # Create new user
         user_id = str(uuid.uuid4())
         new_user = {
             "id": user_id,
-            "email": email,
+            "email": f"tg_{telegram_id}@telegram.user",
             "password_hash": "",  # No password for Telegram auth
-            "full_name": first_name,
+            "full_name": full_name,
             "role": "buyer",
-            "avatar": photo_url,
+            "avatar": data.photo_url,
             "balance": 0.0,
             "telegram_id": telegram_id,
-            "telegram_username": username,
+            "telegram_username": data.username,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.users.insert_one(new_user)
         
         # Create JWT token
-        access_token = create_access_token(data={"sub": email})
+        access_token = create_access_token(data={"sub": user_id})
         new_user["created_at"] = datetime.fromisoformat(new_user["created_at"])
         
         return TokenResponse(access_token=access_token, user=User(**new_user))
 
-@api_router.post("/auth/telegram/update-email")
-async def update_telegram_user_email(
-    new_email: str,
-    user: dict = Depends(get_current_user)
-):
-    """Update email for Telegram-registered user"""
-    # Check if user has telegram auth
-    if not user.get("telegram_id"):
-        raise HTTPException(status_code=400, detail="Not a Telegram account")
+@api_router.post("/auth/telegram/link")
+async def link_telegram_account(data: TelegramWidgetData, user: dict = Depends(get_current_user)):
+    """Link Telegram account to existing user"""
+    bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    if not bot_token:
+        raise HTTPException(status_code=500, detail="Telegram bot token not configured")
     
-    # Check if new email already exists
-    existing = await db.users.find_one({"email": new_email})
+    # Prepare data for verification
+    auth_data = {
+        "id": data.id,
+        "first_name": data.first_name,
+        "auth_date": data.auth_date,
+        "hash": data.hash
+    }
+    if data.last_name:
+        auth_data["last_name"] = data.last_name
+    if data.username:
+        auth_data["username"] = data.username
+    if data.photo_url:
+        auth_data["photo_url"] = data.photo_url
+    
+    # Verify the hash
+    if not verify_telegram_auth(auth_data.copy(), bot_token):
+        raise HTTPException(status_code=401, detail="Invalid Telegram auth data")
+    
+    # Check if this telegram is already linked to another account
+    existing = await db.users.find_one({"telegram_id": data.id}, {"_id": 0})
     if existing and existing["id"] != user["id"]:
-        raise HTTPException(status_code=400, detail="Email already in use")
+        raise HTTPException(status_code=400, detail="This Telegram account is already linked to another user")
     
-    # Update email
+    # Link telegram to user
     await db.users.update_one(
         {"id": user["id"]},
-        {"$set": {"email": new_email}}
+        {"$set": {
+            "telegram_id": data.id,
+            "telegram_username": data.username
+        }}
     )
     
-    return {"message": "Email updated successfully"}
+    return {"message": "Telegram account linked successfully"}
+
+@api_router.post("/auth/telegram/unlink")
+async def unlink_telegram_account(user: dict = Depends(get_current_user)):
+    """Unlink Telegram account from user"""
+    if not user.get("telegram_id"):
+        raise HTTPException(status_code=400, detail="No Telegram account linked")
+    
+    # Check if user has password (can still login without telegram)
+    if not user.get("password_hash"):
+        raise HTTPException(status_code=400, detail="Cannot unlink: no password set. Set a password first.")
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$unset": {"telegram_id": "", "telegram_username": ""}}
+    )
+    
+    return {"message": "Telegram account unlinked successfully"}
 
 # === Balance & Transactions Routes ===
 @api_router.get("/balance")
