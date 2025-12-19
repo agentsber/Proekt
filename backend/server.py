@@ -925,13 +925,43 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
             {"$set": {"status": "paid", "payment_id": session_id}}
         )
         
-        # Update product sales count
+        # Update product sales count and send notifications
         order = await db.orders.find_one({"id": transaction["order_id"]}, {"_id": 0})
         if order:
+            # Get buyer info
+            buyer = await db.users.find_one({"id": order["user_id"]}, {"_id": 0})
+            
             for item in order["items"]:
                 await db.products.update_one(
                     {"id": item["product_id"]},
                     {"$inc": {"sales_count": item["quantity"], "stock": -item["quantity"]}}
+                )
+                
+                # Get product and seller info for notification
+                product = await db.products.find_one({"id": item["product_id"]}, {"_id": 0})
+                if product:
+                    seller = await db.users.find_one({"id": product["seller_id"]}, {"_id": 0})
+                    
+                    # Notify seller about sale
+                    if seller and seller.get("telegram_id"):
+                        await send_telegram_notification(
+                            seller["telegram_id"],
+                            f"🎉 <b>Новая продажа!</b>\n\n"
+                            f"📦 Товар: {item['title']}\n"
+                            f"💰 Сумма: {item['price'] * item['quantity']}₽\n"
+                            f"👤 Покупатель: {buyer.get('full_name', 'Пользователь')}\n\n"
+                            f"Перейдите в личный кабинет для подробностей."
+                        )
+            
+            # Notify buyer about successful purchase
+            if buyer and buyer.get("telegram_id"):
+                items_text = "\n".join([f"  • {item['title']} x{item['quantity']}" for item in order["items"]])
+                await send_telegram_notification(
+                    buyer["telegram_id"],
+                    f"✅ <b>Заказ оплачен!</b>\n\n"
+                    f"📦 Товары:\n{items_text}\n\n"
+                    f"💰 Итого: {order['total']}₽\n\n"
+                    f"Спасибо за покупку!"
                 )
     
     return {
