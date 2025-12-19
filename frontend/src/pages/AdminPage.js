@@ -84,6 +84,13 @@ export default function AdminPage() {
     ]
   });
 
+  const [blogForm, setBlogForm] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    image: ''
+  });
+
   useEffect(() => {
     fetchAll();
   }, []);
