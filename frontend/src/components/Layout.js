@@ -355,6 +355,7 @@ export const Layout = ({ children }) => {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 };
