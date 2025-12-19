@@ -1803,6 +1803,159 @@ export default function AdminPage() {
               </form>
             </div>
           </TabsContent>
+
+          {/* Blog Tab */}
+          <TabsContent value="blog">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold" style={{ fontFamily: 'Unbounded' }}>
+                Управление блогом
+              </h2>
+              <Dialog open={showBlogDialog} onOpenChange={(open) => {
+                setShowBlogDialog(open);
+                if (!open) {
+                  setEditingBlogPost(null);
+                  resetBlogForm();
+                }
+              }}>
+                <DialogTrigger asChild>
+                  <Button className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="add-blog-button">
+                    <span className="flex items-center">
+                      <Plus className="w-5 h-5 mr-2" />
+                      Добавить статью
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-[#0d1117] border-[#30363d] max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold" style={{ fontFamily: 'Unbounded' }}>
+                      {editingBlogPost ? 'Редактировать статью' : 'Добавить статью'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSaveBlogPost} className="space-y-4" data-testid="blog-form">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="blog-title">Заголовок</Label>
+                        <Input
+                          id="blog-title"
+                          value={blogForm.title}
+                          onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })}
+                          required
+                          data-testid="blog-title-input"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="blog-slug">Slug (URL)</Label>
+                        <Input
+                          id="blog-slug"
+                          value={blogForm.slug}
+                          onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
+                          required
+                          placeholder="my-blog-post"
+                          data-testid="blog-slug-input"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="blog-image">URL изображения</Label>
+                      <Input
+                        id="blog-image"
+                        value={blogForm.image}
+                        onChange={(e) => setBlogForm({ ...blogForm, image: e.target.value })}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="blog-content">Содержание</Label>
+                      <Textarea
+                        id="blog-content"
+                        value={blogForm.content}
+                        onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                        required
+                        rows={10}
+                        placeholder="Напишите статью здесь..."
+                        data-testid="blog-content-input"
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-3 pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowBlogDialog(false);
+                          setEditingBlogPost(null);
+                          resetBlogForm();
+                        }}
+                        className="border-[#30363d]"
+                      >
+                        Отмена
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="bg-primary hover:bg-primary-hover text-black"
+                        data-testid="submit-blog-button"
+                      >
+                        {editingBlogPost ? 'Обновить' : 'Опубликовать'}
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="blog-posts-grid-admin">
+              {blogPosts.map(post => (
+                <div key={post.id} className="glass-panel rounded-xl overflow-hidden" data-testid={`blog-post-admin-${post.id}`}>
+                  {post.image && (
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold mb-2" style={{ fontFamily: 'Unbounded' }}>
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-[#8b949e] mb-2">/{post.slug}</p>
+                    <p className="text-sm text-[#8b949e] mb-4 line-clamp-2">
+                      {post.content?.substring(0, 100)}...
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-[#8b949e] mb-4">
+                      <span>
+                        {post.published_at ? new Date(post.published_at).toLocaleDateString('ru-RU') : 'Не опубликовано'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditBlogPost(post)}
+                        className="flex-1"
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Редактировать
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteBlogPost(post.id)}
+                        className="text-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {blogPosts.length === 0 && (
+                <div className="col-span-3 text-center py-12 text-[#8b949e]">
+                  Статей пока нет. Создайте первую статью!
+                </div>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
