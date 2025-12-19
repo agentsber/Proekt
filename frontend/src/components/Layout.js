@@ -179,103 +179,40 @@ export const Layout = ({ children }) => {
       <div className="flex-1 ml-20">
         {/* Header */}
         <header className="sticky top-0 z-30 glass-panel border-b border-[#30363d]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-xl" style={{ fontFamily: 'Unbounded' }}>
-                  {siteSettings?.site_name?.charAt(0) || 'G'}
-                </span>
+          <div className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              {/* Page Title / Navigation */}
+              <nav className="flex items-center space-x-6">
+                <Link to="/catalog" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="catalog-link">
+                  Каталог
+                </Link>
+                <Link to="/giveaways" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="giveaways-link">
+                  Раздачи
+                </Link>
+                <Link to="/blog" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="blog-link">
+                  Блог
+                </Link>
+              </nav>
+
+              {/* Search */}
+              <div className="flex items-center">
+                <button
+                  onClick={handleSearchOpen}
+                  className="flex items-center space-x-2 px-4 py-2 bg-[#161b22] hover:bg-[#21262d] rounded-lg transition-colors text-[#8b949e]"
+                  data-testid="search-button"
+                >
+                  <Search className="w-5 h-5" />
+                  <span className="hidden sm:inline">Поиск...</span>
+                </button>
               </div>
-              <span className="text-xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="site-logo">
-                {siteSettings?.site_name || 'GameHub'}
-              </span>
-            </Link>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link to="/catalog" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="catalog-link">
-                Каталог
-              </Link>
-              <Link to="/giveaways" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="giveaways-link">
-                Раздачи
-              </Link>
-              <Link to="/blog" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="blog-link">
-                Блог
-              </Link>
-            </nav>
-
-            {/* Right Side */}
-            <div className="flex items-center space-x-4">
-              {/* Search Button */}
-              <button
-                onClick={handleSearchOpen}
-                className="p-2 hover:bg-[#161b22] rounded-lg transition-colors"
-                data-testid="search-button"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
-              {/* Cart */}
-              <button
-                onClick={() => navigate('/cart')}
-                className="relative p-2 hover:bg-[#161b22] rounded-lg transition-colors"
-                data-testid="cart-button"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {cartItemsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" data-testid="cart-count">
-                    {cartItemsCount}
-                  </span>
-                )}
-              </button>
-
-              {/* User Menu */}
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 hover:bg-[#161b22] rounded-lg transition-colors" data-testid="user-menu-button">
-                      <User className="w-5 h-5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-[#0d1117] border-[#30363d]">
-                    <DropdownMenuItem onClick={() => navigate('/profile')} data-testid="profile-menu-item">
-                      <User className="w-4 h-4 mr-2" />
-                      Профиль
-                    </DropdownMenuItem>
-                    {(user.role === 'seller' || user.role === 'admin') && (
-                      <DropdownMenuItem onClick={() => navigate('/seller-dashboard')} data-testid="seller-dashboard-menu-item">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Мои товары
-                      </DropdownMenuItem>
-                    )}
-                    {user.role === 'admin' && (
-                      <DropdownMenuItem onClick={() => navigate('/admin')} data-testid="admin-menu-item">
-                        <Settings className="w-4 h-4 mr-2" />
-                        Админ-панель
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={logout} data-testid="logout-menu-item">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Выйти
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button onClick={() => navigate('/auth')} className="skew-button bg-primary hover:bg-primary-hover text-black" data-testid="login-button">
-                  <span>Войти</span>
-                </Button>
-              )}
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main>
-        {children}
-      </main>
+        {/* Main Content */}
+        <main>
+          {children}
+        </main>
 
       {/* Search Modal */}
       {searchOpen && (
