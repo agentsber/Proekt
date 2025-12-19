@@ -1201,6 +1201,8 @@ async def send_message(chat_id: str, data: ChatMessageCreate, user: dict = Depen
         {"$set": {"last_message": data.content, "last_message_at": now}}
     )
     
+    # Return without _id
+    message.pop("_id", None)
     return message
 
 # === Giveaway Routes ===
