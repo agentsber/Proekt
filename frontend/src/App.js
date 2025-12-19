@@ -230,7 +230,7 @@ function App() {
                     <Route path="/auth" element={!user ? <AuthPage /> : <Navigate to="/profile" />} />
                     <Route path="/auth/telegram" element={<TelegramAuthPage />} />
                     <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/auth" />} />
-                    <Route path="/seller-dashboard" element={user && user.role !== 'buyer' ? <SellerDashboard /> : <Navigate to="/auth" />} />
+                    <Route path="/seller-dashboard" element={user ? <SellerDashboard /> : <Navigate to="/auth" />} />
                     <Route path="/seller/:id" element={<SellerPage />} />
                     <Route path="/giveaways" element={<GiveawaysPage />} />
                     <Route path="/blog" element={<BlogPage />} />
