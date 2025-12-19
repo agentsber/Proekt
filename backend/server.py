@@ -1060,6 +1060,146 @@ async def get_admin_blog_posts(user: dict = Depends(require_admin)):
             p["published_at"] = datetime.fromisoformat(p["published_at"]).isoformat()
     return posts
 
+# === Chat Routes ===
+@api_router.get("/chats")
+async def get_user_chats(user: dict = Depends(get_current_user)):
+    """Get all chats for current user"""
+    chats = await db.chats.find({
+        "$or": [
+            {"buyer_id": user["id"]},
+            {"seller_id": user["id"]}
+        ]
+    }, {"_id": 0}).sort("last_message_at", -1).to_list(100)
+    
+    result = []
+    for chat in chats:
+        # Get other user info
+        other_user_id = chat["seller_id"] if chat["buyer_id"] == user["id"] else chat["buyer_id"]
+        other_user = await db.users.find_one({"id": other_user_id}, {"_id": 0, "password_hash": 0})
+        
+        # Get product info if exists
+        product = None
+        if chat.get("product_id"):
+            product = await db.products.find_one({"id": chat["product_id"]}, {"_id": 0})
+        
+        # Count unread messages
+        unread_count = await db.chat_messages.count_documents({
+            "chat_id": chat["id"],
+            "sender_id": {"$ne": user["id"]},
+            "read": False
+        })
+        
+        result.append({
+            **chat,
+            "other_user": other_user,
+            "product": product,
+            "unread_count": unread_count
+        })
+    
+    return result
+
+@api_router.post("/chats")
+async def create_or_get_chat(seller_id: str, product_id: Optional[str] = None, user: dict = Depends(get_current_user)):
+    """Create a new chat or get existing one"""
+    if user["id"] == seller_id:
+        raise HTTPException(status_code=400, detail="Cannot chat with yourself")
+    
+    # Check if chat already exists
+    existing = await db.chats.find_one({
+        "buyer_id": user["id"],
+        "seller_id": seller_id,
+        "product_id": product_id
+    }, {"_id": 0})
+    
+    if existing:
+        return existing
+    
+    # Create new chat
+    chat_id = str(uuid.uuid4())
+    chat = {
+        "id": chat_id,
+        "buyer_id": user["id"],
+        "seller_id": seller_id,
+        "product_id": product_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_message": None,
+        "last_message_at": None
+    }
+    await db.chats.insert_one(chat)
+    return chat
+
+@api_router.get("/chats/{chat_id}")
+async def get_chat(chat_id: str, user: dict = Depends(get_current_user)):
+    """Get chat by ID"""
+    chat = await db.chats.find_one({"id": chat_id}, {"_id": 0})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    if user["id"] not in [chat["buyer_id"], chat["seller_id"]]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get other user info
+    other_user_id = chat["seller_id"] if chat["buyer_id"] == user["id"] else chat["buyer_id"]
+    other_user = await db.users.find_one({"id": other_user_id}, {"_id": 0, "password_hash": 0})
+    
+    # Get product info
+    product = None
+    if chat.get("product_id"):
+        product = await db.products.find_one({"id": chat["product_id"]}, {"_id": 0})
+    
+    return {**chat, "other_user": other_user, "product": product}
+
+@api_router.get("/chats/{chat_id}/messages")
+async def get_chat_messages(chat_id: str, user: dict = Depends(get_current_user)):
+    """Get messages for a chat"""
+    chat = await db.chats.find_one({"id": chat_id}, {"_id": 0})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    if user["id"] not in [chat["buyer_id"], chat["seller_id"]]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    messages = await db.chat_messages.find({"chat_id": chat_id}, {"_id": 0}).sort("created_at", 1).to_list(500)
+    
+    # Mark messages as read
+    await db.chat_messages.update_many(
+        {"chat_id": chat_id, "sender_id": {"$ne": user["id"]}, "read": False},
+        {"$set": {"read": True}}
+    )
+    
+    return messages
+
+@api_router.post("/chats/{chat_id}/messages")
+async def send_message(chat_id: str, data: ChatMessageCreate, user: dict = Depends(get_current_user)):
+    """Send a message in a chat"""
+    chat = await db.chats.find_one({"id": chat_id}, {"_id": 0})
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    if user["id"] not in [chat["buyer_id"], chat["seller_id"]]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    message_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    message = {
+        "id": message_id,
+        "chat_id": chat_id,
+        "sender_id": user["id"],
+        "content": data.content,
+        "created_at": now,
+        "read": False
+    }
+    await db.chat_messages.insert_one(message)
+    
+    # Update chat with last message
+    await db.chats.update_one(
+        {"id": chat_id},
+        {"$set": {"last_message": data.content, "last_message_at": now}}
+    )
+    
+    return message
+
 # === Giveaway Routes ===
 @api_router.get("/giveaways", response_model=List[Giveaway])
 async def get_giveaways():
