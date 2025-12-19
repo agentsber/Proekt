@@ -317,8 +317,7 @@ async def require_admin(user: dict = Depends(get_current_user)) -> dict:
     return user
 
 async def require_seller(user: dict = Depends(get_current_user)) -> dict:
-    if user.get("role") not in ["seller", "admin"]:
-        raise HTTPException(status_code=403, detail="Seller access required")
+    # Allow all authenticated users to sell
     return user
 
 # === File Upload Routes ===
