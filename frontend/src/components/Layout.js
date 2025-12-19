@@ -12,6 +12,7 @@ export const Layout = ({ children }) => {
   const { cart } = useContext(CartContext);
   const { siteSettings } = useContext(SiteSettingsContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   
