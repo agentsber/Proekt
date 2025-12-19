@@ -711,6 +711,7 @@ class GameHubAPITester:
         
         # Run tests in order
         self.test_auth_flow()
+        self.test_telegram_auth()  # Add Telegram auth tests
         self.test_categories_api()
         self.test_products_api()
         self.test_cart_and_orders()
