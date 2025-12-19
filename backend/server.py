@@ -997,6 +997,36 @@ async def create_blog_post(data: BlogPostCreate, user: dict = Depends(require_ad
     post_doc["published_at"] = datetime.fromisoformat(post_doc["published_at"])
     return BlogPost(**post_doc)
 
+@api_router.put("/blog/{post_id}", response_model=BlogPost)
+async def update_blog_post(post_id: str, data: BlogPostCreate, user: dict = Depends(require_admin)):
+    post = await db.blog_posts.find_one({"id": post_id}, {"_id": 0})
+    if not post:
+        raise HTTPException(status_code=404, detail="Blog post not found")
+    
+    update_data = data.model_dump()
+    await db.blog_posts.update_one({"id": post_id}, {"$set": update_data})
+    
+    updated_post = await db.blog_posts.find_one({"id": post_id}, {"_id": 0})
+    updated_post["published_at"] = datetime.fromisoformat(updated_post["published_at"])
+    return BlogPost(**updated_post)
+
+@api_router.delete("/blog/{post_id}")
+async def delete_blog_post(post_id: str, user: dict = Depends(require_admin)):
+    post = await db.blog_posts.find_one({"id": post_id}, {"_id": 0})
+    if not post:
+        raise HTTPException(status_code=404, detail="Blog post not found")
+    
+    await db.blog_posts.delete_one({"id": post_id})
+    return {"message": "Blog post deleted"}
+
+@api_router.get("/admin/blog")
+async def get_admin_blog_posts(user: dict = Depends(require_admin)):
+    posts = await db.blog_posts.find({}, {"_id": 0}).to_list(1000)
+    for p in posts:
+        if "published_at" in p:
+            p["published_at"] = datetime.fromisoformat(p["published_at"]).isoformat()
+    return posts
+
 # === Giveaway Routes ===
 @api_router.get("/giveaways", response_model=List[Giveaway])
 async def get_giveaways():
