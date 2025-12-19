@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const TELEGRAM_BOT_USERNAME = 'YourGameHubBot'; // Замените на username вашего бота
+const TELEGRAM_BOT_USERNAME = 'eplaysbot';
 
 export function TelegramLoginButton({ onAuth, buttonSize = 'large', cornerRadius = 8 }) {
   const containerRef = useRef(null);
