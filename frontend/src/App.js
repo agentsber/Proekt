@@ -217,6 +217,7 @@ function App() {
         <CurrencyContext.Provider value={{ currency, setCurrency }}>
           <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite, fetchFavorites }}>
             <SiteSettingsContext.Provider value={{ siteSettings, fetchSiteSettings }}>
+              <SEOHead />
               <div className="App min-h-screen noise-bg">
                 <BrowserRouter>
                   <Routes>
