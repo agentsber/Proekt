@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Settings, Search, Menu, X, Loader2 } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ShoppingCart, User, LogOut, Settings, Search, Menu, X, Loader2, Plus, Bell, MessageCircle, Home } from 'lucide-react';
 import { AuthContext, CartContext, SiteSettingsContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
