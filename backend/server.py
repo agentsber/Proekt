@@ -214,6 +214,39 @@ class WithdrawalRequest(BaseModel):
     method: str = "bank_transfer"
     account_details: Optional[str] = None
 
+# === Chat Models ===
+class ChatMessage(BaseModel):
+    id: str
+    chat_id: str
+    sender_id: str
+    content: str
+    created_at: datetime
+    read: bool = False
+
+class ChatMessageCreate(BaseModel):
+    content: str
+
+class Chat(BaseModel):
+    id: str
+    buyer_id: str
+    seller_id: str
+    product_id: Optional[str] = None
+    created_at: datetime
+    last_message: Optional[str] = None
+    last_message_at: Optional[datetime] = None
+
+class ChatWithDetails(BaseModel):
+    id: str
+    buyer_id: str
+    seller_id: str
+    product_id: Optional[str] = None
+    created_at: datetime
+    last_message: Optional[str] = None
+    last_message_at: Optional[datetime] = None
+    other_user: Optional[dict] = None
+    product: Optional[dict] = None
+    unread_count: int = 0
+
 # === Telegram Auth Models ===
 class TelegramWidgetData(BaseModel):
     id: int
