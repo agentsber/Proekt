@@ -1486,6 +1486,16 @@ class SiteSettings(BaseModel):
     footer_navigation: List[NavigationLink] = []
     footer_support: List[NavigationLink] = []
     footer_legal: List[NavigationLink] = []
+    # SEO Settings
+    seo_title: Optional[str] = None
+    seo_description: Optional[str] = None
+    seo_keywords: Optional[str] = None
+    og_image: Optional[str] = None
+    favicon_url: Optional[str] = None
+    google_analytics_id: Optional[str] = None
+    yandex_metrika_id: Optional[str] = None
+    robots_txt: Optional[str] = None
+    custom_head_scripts: Optional[str] = None
 
 @api_router.get("/admin/settings")
 async def get_site_settings(user: dict = Depends(require_admin)):
