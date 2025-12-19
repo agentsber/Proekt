@@ -151,8 +151,20 @@ export const Layout = ({ children }) => {
         <header className="sticky top-0 z-30 glass-panel border-b border-[#30363d]">
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
+              {/* Logo */}
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#00ff9d] to-[#00cc7d] rounded-lg flex items-center justify-center">
+                  <span className="text-black font-bold text-xl" style={{ fontFamily: 'Unbounded' }}>
+                    {siteSettings?.site_name?.charAt(0) || 'G'}
+                  </span>
+                </div>
+                <span className="text-xl font-bold hidden sm:inline" style={{ fontFamily: 'Unbounded' }}>
+                  {siteSettings?.site_name || 'GameHub'}
+                </span>
+              </Link>
+
               {/* Page Title / Navigation */}
-              <nav className="flex items-center space-x-6">
+              <nav className="hidden md:flex items-center space-x-6">
                 <Link to="/catalog" className="text-[#8b949e] hover:text-[#00ff9d] transition-colors" data-testid="catalog-link">
                   Каталог
                 </Link>
