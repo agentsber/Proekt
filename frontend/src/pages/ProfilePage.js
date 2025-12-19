@@ -187,20 +187,40 @@ export default function ProfilePage() {
                 <span className="inline-flex items-center rounded-full border border-primary bg-primary-10 px-3 py-1 text-xs font-semibold text-primary mt-2">
                   {user?.role}
                 </span>
+                {user?.telegram_username && (
+                  <div className="flex items-center mt-2 text-sm text-[#8b949e]">
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    @{user.telegram_username}
+                  </div>
+                )}
               </div>
             </div>
-            {(user?.role === 'seller' || user?.role === 'admin') && (
-              <Button
-                onClick={() => window.location.href = '/seller-dashboard'}
-                className="skew-button bg-primary hover:bg-primary-hover text-black"
-                data-testid="manage-products-button"
-              >
-                <span className="flex items-center">
-                  <Package className="w-5 h-5 mr-2" />
-                  Управление товарами
-                </span>
-              </Button>
-            )}
+            <div className="flex flex-col space-y-2">
+              {(user?.role === 'seller' || user?.role === 'admin') && (
+                <Button
+                  onClick={() => window.location.href = '/seller-dashboard'}
+                  className="skew-button bg-primary hover:bg-primary-hover text-black"
+                  data-testid="manage-products-button"
+                >
+                  <span className="flex items-center">
+                    <Package className="w-5 h-5 mr-2" />
+                    Управление товарами
+                  </span>
+                </Button>
+              )}
+              {!user?.telegram_id && (
+                <Button
+                  onClick={handleLinkTelegram}
+                  variant="outline"
+                  className="skew-button border-primary hover:bg-primary-10"
+                >
+                  <span className="flex items-center">
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Привязать Telegram
+                  </span>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
