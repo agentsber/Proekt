@@ -153,13 +153,37 @@ export default function ProductPage() {
             </div>
 
             {product.seller_id && (
-              <button
-                onClick={() => navigate(`/seller/${product.seller_id}`)}
-                className="text-primary hover:text-primary-hover text-sm"
-                data-testid="view-seller-button"
-              >
-                Посмотреть продавца →
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => navigate(`/seller/${product.seller_id}`)}
+                  className="text-primary hover:text-primary-hover text-sm"
+                  data-testid="view-seller-button"
+                >
+                  Посмотреть продавца →
+                </button>
+                {user && user.id !== product.seller_id && (
+                  <Button
+                    onClick={async () => {
+                      try {
+                        const response = await axios.post(
+                          `${API}/chats?seller_id=${product.seller_id}&product_id=${product.id}`,
+                          {},
+                          { headers: { Authorization: `Bearer ${token}` } }
+                        );
+                        navigate(`/chats/${response.data.id}`);
+                      } catch (error) {
+                        toast.error('Ошибка создания чата');
+                      }
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="border-primary text-primary hover:bg-primary hover:text-black"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    Написать
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </div>
