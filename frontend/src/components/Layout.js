@@ -61,42 +61,42 @@ export const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-16">
       {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[#0d1117] border-t border-[#30363d] z-50 flex items-center justify-around px-2">
+      <nav className="fixed bottom-0 left-0 right-0 h-14 bg-[#0d1117] border-t border-[#30363d] z-50 flex items-center justify-around px-1">
         {/* Home */}
         <Link
           to="/"
-          className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all ${location.pathname === '/' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+          className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname === '/' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
         >
-          <Home className="w-6 h-6" />
-          <span className="text-[10px] mt-1">Главная</span>
+          <Home className="w-5 h-5" />
+          <span className="text-[9px] mt-0.5">Главная</span>
         </Link>
 
         {/* Sell / Add Product (for sellers) */}
         {user && (user.role === 'seller' || user.role === 'admin') && (
           <Link
             to="/seller-dashboard"
-            className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all ${location.pathname === '/seller-dashboard' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+            className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname === '/seller-dashboard' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
           >
-            <Plus className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Продать</span>
+            <Plus className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Продать</span>
           </Link>
         )}
 
         {/* Notifications */}
         {user && (
-          <button className="flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all text-[#8b949e] hover:text-white relative">
-            <Bell className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Увед.</span>
+          <button className="flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all text-[#8b949e] hover:text-white relative">
+            <Bell className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Увед.</span>
           </button>
         )}
 
         {/* Chats */}
         {user && (
-          <button className="flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all text-[#8b949e] hover:text-white">
-            <MessageCircle className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Чаты</span>
+          <button className="flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all text-[#8b949e] hover:text-white">
+            <MessageCircle className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Чаты</span>
           </button>
         )}
 
@@ -104,18 +104,18 @@ export const Layout = ({ children }) => {
         {user ? (
           <Link
             to="/profile"
-            className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all ${location.pathname === '/profile' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+            className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname === '/profile' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
           >
-            <User className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Профиль</span>
+            <User className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Профиль</span>
           </Link>
         ) : (
           <Link
             to="/auth"
-            className="flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all text-primary hover:text-primary-hover"
+            className="flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all text-primary hover:text-primary-hover"
           >
-            <User className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Войти</span>
+            <User className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Войти</span>
           </Link>
         )}
 
@@ -123,25 +123,25 @@ export const Layout = ({ children }) => {
         {user?.role === 'admin' && (
           <Link
             to="/admin"
-            className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all ${location.pathname === '/admin' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+            className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all ${location.pathname === '/admin' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
           >
-            <Settings className="w-6 h-6" />
-            <span className="text-[10px] mt-1">Админ</span>
+            <Settings className="w-5 h-5" />
+            <span className="text-[9px] mt-0.5">Админ</span>
           </Link>
         )}
 
         {/* Cart */}
         <button
           onClick={() => navigate('/cart')}
-          className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-all relative ${location.pathname === '/cart' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
+          className={`flex flex-col items-center justify-center px-2 py-1 rounded-lg transition-all relative ${location.pathname === '/cart' ? 'text-primary' : 'text-[#8b949e] hover:text-white'}`}
         >
-          <ShoppingCart className="w-6 h-6" />
+          <ShoppingCart className="w-5 h-5" />
           {cartItemsCount > 0 && (
-            <span className="absolute top-0 right-1 bg-primary text-black text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 right-0 bg-primary text-black text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
               {cartItemsCount}
             </span>
           )}
-          <span className="text-[10px] mt-1">Корзина</span>
+          <span className="text-[9px] mt-0.5">Корзина</span>
         </button>
       </nav>
 
