@@ -183,19 +183,6 @@ export default function AuthPage() {
                       data-testid="register-password-input"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="register-role">Роль</Label>
-                    <select
-                      id="register-role"
-                      className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg"
-                      value={registerData.role}
-                      onChange={(e) => setRegisterData({ ...registerData, role: e.target.value })}
-                      data-testid="register-role-select"
-                    >
-                      <option value="buyer">Покупатель</option>
-                      <option value="seller">Продавец</option>
-                    </select>
-                  </div>
                   <Button
                     type="submit"
                     className="w-full bg-primary hover:bg-primary-hover text-black font-bold"
