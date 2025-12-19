@@ -4,7 +4,6 @@ import { ShoppingCart, User, LogOut, Settings, Search, Menu, X, Loader2 } from '
 import { AuthContext, CartContext, CurrencyContext, SiteSettingsContext } from '@/App';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
 import { API } from '@/App';
 
