@@ -730,6 +730,10 @@ export default function AdminPage() {
               <BookOpen className="w-4 h-4 mr-2" />
               Блог
             </TabsTrigger>
+            <TabsTrigger value="seo" data-testid="seo-tab">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              SEO
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
