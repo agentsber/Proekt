@@ -1320,7 +1320,7 @@ async def create_giveaway(data: GiveawayCreate, user: dict = Depends(require_adm
 # === Seller Routes ===
 @api_router.get("/sellers/{seller_id}")
 async def get_seller(seller_id: str):
-    seller = await db.users.find_one({"id": seller_id, "role": "seller"}, {"_id": 0, "password_hash": 0})
+    seller = await db.users.find_one({"id": seller_id}, {"_id": 0, "password_hash": 0})
     if not seller:
         raise HTTPException(status_code=404, detail="Seller not found")
     return seller
