@@ -282,6 +282,32 @@ class TelegramWidgetData(BaseModel):
     auth_date: int
     hash: str
 
+# === Review Models ===
+class ReviewCreate(BaseModel):
+    product_id: str
+    order_id: str
+    rating: int = Field(..., ge=1, le=5)
+    text: str
+
+class SellerResponse(BaseModel):
+    text: str
+
+class Review(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    product_id: str
+    seller_id: str
+    buyer_id: str
+    order_id: str
+    rating: int
+    text: str
+    status: str = "pending"  # pending, approved, rejected
+    seller_response: Optional[str] = None
+    seller_response_at: Optional[datetime] = None
+    created_at: datetime
+    buyer_name: Optional[str] = None
+    product_title: Optional[str] = None
+
 # === Helper Functions ===
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
