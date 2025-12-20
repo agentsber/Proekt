@@ -119,7 +119,7 @@ class Product(BaseModel):
     price: float
     product_type: str
     images: List[str]
-    category_id: str
+    category_id: Optional[str] = None
     seller_id: str
     stock: int
     sales_count: int = 0
