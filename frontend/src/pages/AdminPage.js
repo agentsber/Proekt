@@ -1105,7 +1105,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cat-slug">Slug</Label>
+                        <Label htmlFor="cat-slug">URL-slug</Label>
                         <Input
                           id="cat-slug"
                           value={categoryForm.slug}
@@ -1884,7 +1884,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="blog-slug">Slug (URL)</Label>
+                        <Label htmlFor="blog-slug">URL-slug</Label>
                         <Input
                           id="blog-slug"
                           value={blogForm.slug}
