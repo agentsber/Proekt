@@ -1126,10 +1126,15 @@ export default function AdminPage() {
                         data-testid="category-parent-select"
                       >
                         <option value="">Нет (корневая категория)</option>
-                        {categories.filter(c => c.level === 0).map(cat => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
+                        {categories
+                          .filter(c => !editingCategory || c.id !== editingCategory.id)
+                          .map(cat => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.level > 0 ? '— '.repeat(cat.level) : ''}{cat.name}
+                            </option>
+                          ))}
                       </select>
+                      <p className="text-xs text-[#8b949e] mt-1">Выберите категорию, чтобы создать подкатегорию</p>
                     </div>
                     <div>
                       <Label htmlFor="cat-desc">Описание</Label>
