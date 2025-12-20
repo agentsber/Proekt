@@ -1285,7 +1285,7 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div>
-                      <Label>Продавец (ID)</Label>
+                      <Label>Продавец</Label>
                       <select
                         value={productForm.seller_id}
                         onChange={(e) => setProductForm({ ...productForm, seller_id: e.target.value })}
@@ -1293,7 +1293,7 @@ export default function AdminPage() {
                         required
                       >
                         <option value="">Выберите продавца</option>
-                        {users.filter(u => u.role === 'seller' || u.role === 'admin').map(user => (
+                        {users.filter(u => u.role === 'user' || u.role === 'admin').map(user => (
                           <option key={user.id} value={user.id}>{user.full_name} ({user.email})</option>
                         ))}
                       </select>
@@ -2045,7 +2045,7 @@ export default function AdminPage() {
                 <div className="space-y-4 pt-6 border-t border-[#30363d]">
                   <h3 className="text-lg font-semibold text-primary">Open Graph (соц. сети)</h3>
                   <div>
-                    <Label htmlFor="og-image">OG Image URL</Label>
+                    <Label htmlFor="og-image">URL изображения OG</Label>
                     <Input
                       id="og-image"
                       value={settingsForm.og_image || ''}
@@ -2055,7 +2055,7 @@ export default function AdminPage() {
                     <p className="text-xs text-[#8b949e] mt-1">Изображение для предпросмотра в соц. сетях (1200x630px)</p>
                   </div>
                   <div>
-                    <Label htmlFor="favicon-url">Favicon URL</Label>
+                    <Label htmlFor="favicon-url">URL иконки сайта (Favicon)</Label>
                     <Input
                       id="favicon-url"
                       value={settingsForm.favicon_url || ''}
