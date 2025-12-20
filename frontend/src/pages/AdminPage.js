@@ -1394,7 +1394,7 @@ export default function AdminPage() {
                           <span>{product.title}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-primary">${product.price}</td>
+                      <td className="px-6 py-4 text-primary">{product.price}₽</td>
                       <td className="px-6 py-4 text-[#8b949e]">{product.stock}</td>
                       <td className="px-6 py-4 text-[#8b949e]">{product.sales_count}</td>
                       <td className="px-6 py-4">
