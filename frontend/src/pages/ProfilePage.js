@@ -282,7 +282,7 @@ export default function ProfilePage() {
               <div>
                 <p className="text-sm text-[#8b949e] mb-1">Баланс</p>
                 <h2 className="text-4xl font-bold" style={{ fontFamily: 'Unbounded' }} data-testid="balance-amount">
-                  ${balance.toFixed(2)}
+                  {balance.toFixed(0)}₽
                 </h2>
               </div>
             </div>
@@ -365,13 +365,13 @@ export default function ProfilePage() {
                       {order.items.map((item, idx) => (
                         <div key={idx} className="flex justify-between text-sm">
                           <span>{item.title} x {item.quantity}</span>
-                          <span className="text-primary">${(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="text-primary">{(item.price * item.quantity).toFixed(0)}₽</span>
                         </div>
                       ))}
                     </div>
                     <div className="flex justify-between font-bold pt-4 border-t border-[#30363d]">
                       <span>Итого:</span>
-                      <span className="text-primary">${order.total.toFixed(2)}</span>
+                      <span className="text-primary">{order.total.toFixed(0)}₽</span>
                     </div>
                   </div>
                 ))}
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                         </div>
                         <div>
                           <h3 className="font-semibold mb-1">
-                            {transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'} ${transaction.amount.toFixed(2)}
+                            {transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'} {transaction.amount.toFixed(0)}₽
                           </h3>
                           <p className="text-sm text-[#8b949e]">
                             {new Date(transaction.created_at).toLocaleString('ru-RU')}
@@ -515,7 +515,7 @@ export default function ProfilePage() {
             </h2>
             <div className="mb-4 p-4 bg-[#161b22] rounded-lg">
               <p className="text-sm text-[#8b949e]">Доступно для вывода:</p>
-              <p className="text-2xl font-bold text-primary">${balance.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-primary">{balance.toFixed(0)}₽</p>
             </div>
             <form onSubmit={handleWithdraw} className="space-y-4">
               <div>
