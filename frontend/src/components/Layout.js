@@ -259,7 +259,7 @@ export const Layout = ({ children }) => {
                           <h3 className="font-semibold mb-1">{product.title}</h3>
                           <p className="text-sm text-[#8b949e] line-clamp-1">{product.description}</p>
                         </div>
-                        <div className="text-primary font-bold">${product.price}</div>
+                        <div className="text-primary font-bold">{product.price}₽</div>
                       </button>
                     ))}
                   </div>

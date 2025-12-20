@@ -437,7 +437,7 @@ export default function SellerDashboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-primary font-bold">${product.price}</td>
+                    <td className="px-6 py-4 text-primary font-bold">{product.price}₽</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.stock}</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.sales_count}</td>
                     <td className="px-6 py-4 text-[#8b949e]">{product.views_count}</td>
