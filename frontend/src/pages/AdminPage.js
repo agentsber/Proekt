@@ -1238,10 +1238,10 @@ export default function AdminPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label>Цена ($)</Label>
+                        <Label>Цена (₽)</Label>
                         <Input
                           type="number"
-                          step="0.01"
+                          step="1"
                           value={productForm.price}
                           onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
                           required
