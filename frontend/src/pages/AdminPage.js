@@ -946,11 +946,14 @@ export default function AdminPage() {
                           onValueChange={(value) => handleUpdateUserRole(user.id, value)}
                         >
                           <SelectTrigger className="w-32">
-                            <SelectValue />
+                            <SelectValue placeholder={user.role} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="user">Пользователь</SelectItem>
                             <SelectItem value="admin">Администратор</SelectItem>
+                            {/* Backward compatibility for old roles */}
+                            {user.role === 'buyer' && <SelectItem value="buyer">Покупатель (устар.)</SelectItem>}
+                            {user.role === 'seller' && <SelectItem value="seller">Продавец (устар.)</SelectItem>}
                           </SelectContent>
                         </Select>
                       </td>
