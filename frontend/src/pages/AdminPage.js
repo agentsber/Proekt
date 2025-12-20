@@ -1441,7 +1441,7 @@ export default function AdminPage() {
                       <tr key={order.id} className="border-t border-[#30363d]">
                         <td className="px-6 py-4">#{order.id.slice(0, 8)}</td>
                         <td className="px-6 py-4">{user?.email || 'Unknown'}</td>
-                        <td className="px-6 py-4 font-semibold text-primary">${order.total.toFixed(2)}</td>
+                        <td className="px-6 py-4 font-semibold text-primary">{order.total.toFixed(0)}₽</td>
                         <td className="px-6 py-4">
                           <Select 
                             value={order.status} 
