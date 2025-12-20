@@ -956,7 +956,7 @@ export default function AdminPage() {
                         </Select>
                       </td>
                       <td className="px-6 py-4 font-semibold text-primary">
-                        ${user.balance?.toFixed(2) || '0.00'}
+                        {user.balance?.toFixed(0) || '0'}₽
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex space-x-2">
