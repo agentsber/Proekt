@@ -1016,7 +1016,7 @@ export default function AdminPage() {
                             {transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-semibold">${transaction.amount.toFixed(2)}</td>
+                        <td className="px-6 py-4 font-semibold">{transaction.amount.toFixed(0)}₽</td>
                         <td className="px-6 py-4">
                           <Select 
                             value={transaction.status} 
