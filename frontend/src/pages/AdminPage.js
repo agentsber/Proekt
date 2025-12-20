@@ -793,7 +793,7 @@ export default function AdminPage() {
                       <span className="text-[#8b949e]">Средний чек</span>
                       <DollarSign className="w-5 h-5 text-primary" />
                     </div>
-                    <p className="text-3xl font-bold">${advancedStats.overview.avg_order_value.toFixed(2)}</p>
+                    <p className="text-3xl font-bold">{advancedStats.overview.avg_order_value.toFixed(0)}₽</p>
                   </div>
                 </div>
 
