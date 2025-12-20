@@ -110,7 +110,7 @@ export default function ProfilePage() {
       setDepositModalOpen(false);
       setDepositAmount('');
       fetchTransactions();
-      toast.success(`Баланс пополнен на $${amount.toFixed(2)}`);
+      toast.success(`Баланс пополнен на ${amount.toFixed(0)}₽`);
     } catch (error) {
       toast.error('Ошибка пополнения баланса');
     } finally {
@@ -140,7 +140,7 @@ export default function ProfilePage() {
       setWithdrawModalOpen(false);
       setWithdrawAmount('');
       fetchTransactions();
-      toast.success(`Заявка на вывод $${amount.toFixed(2)} создана`);
+      toast.success(`Заявка на вывод ${amount.toFixed(0)}₽ создана`);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Ошибка вывода средств');
     } finally {

@@ -388,7 +388,7 @@ export default function SellerDashboard() {
               <span className="text-[#8b949e]">Доход</span>
               <DollarSign className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-3xl font-bold text-primary" data-testid="total-revenue">${totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-primary" data-testid="total-revenue">{totalRevenue.toFixed(0)}₽</p>
           </div>
           <div className="glass-panel rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
