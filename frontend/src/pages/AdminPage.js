@@ -1025,10 +1025,10 @@ export default function AdminPage() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pending">pending</SelectItem>
-                              <SelectItem value="completed">completed</SelectItem>
-                              <SelectItem value="failed">failed</SelectItem>
-                              <SelectItem value="cancelled">cancelled</SelectItem>
+                              <SelectItem value="pending">Ожидание</SelectItem>
+                              <SelectItem value="completed">Завершено</SelectItem>
+                              <SelectItem value="failed">Ошибка</SelectItem>
+                              <SelectItem value="cancelled">Отменено</SelectItem>
                             </SelectContent>
                           </Select>
                         </td>
@@ -1450,10 +1450,10 @@ export default function AdminPage() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pending">pending</SelectItem>
-                              <SelectItem value="paid">paid</SelectItem>
-                              <SelectItem value="completed">completed</SelectItem>
-                              <SelectItem value="cancelled">cancelled</SelectItem>
+                              <SelectItem value="pending">Ожидание</SelectItem>
+                              <SelectItem value="paid">Оплачено</SelectItem>
+                              <SelectItem value="completed">Завершено</SelectItem>
+                              <SelectItem value="cancelled">Отменено</SelectItem>
                             </SelectContent>
                           </Select>
                         </td>
