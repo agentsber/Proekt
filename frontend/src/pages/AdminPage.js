@@ -874,7 +874,7 @@ export default function AdminPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-primary">${product.revenue.toFixed(2)}</p>
+                          <p className="font-bold text-primary">{product.revenue.toFixed(0)}₽</p>
                           <p className="text-xs text-[#8b949e]">выручка</p>
                         </div>
                       </div>
