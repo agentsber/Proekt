@@ -25,7 +25,7 @@ db = client[DB_NAME]
 
 # Get bot token and frontend URL
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://gamestore-24.preview.emergentagent.com')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://gamehub-market-6.preview.emergentagent.com')
 
 async def generate_auth_token(user_id: str, telegram_id: int) -> str:
     """Generate a one-time authentication token"""
