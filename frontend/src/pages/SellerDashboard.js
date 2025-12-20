@@ -243,7 +243,7 @@ export default function SellerDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="price">Цена ($)</Label>
+                    <Label htmlFor="price">Цена (₽)</Label>
                     <Input
                       id="price"
                       type="number"
