@@ -313,7 +313,7 @@ export default function AdminPage() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      toast.success(`Баланс скорректирован на $${adjustAmount}`);
+      toast.success(`Баланс скорректирован на ${adjustAmount}₽`);
       fetchUsers();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Ошибка корректировки баланса');
@@ -949,9 +949,8 @@ export default function AdminPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="buyer">buyer</SelectItem>
-                            <SelectItem value="seller">seller</SelectItem>
-                            <SelectItem value="admin">admin</SelectItem>
+                            <SelectItem value="user">Пользователь</SelectItem>
+                            <SelectItem value="admin">Администратор</SelectItem>
                           </SelectContent>
                         </Select>
                       </td>
@@ -1008,7 +1007,7 @@ export default function AdminPage() {
                         <td className="px-6 py-4 text-xs text-[#8b949e]">
                           {transaction.id.slice(0, 8)}...
                         </td>
-                        <td className="px-6 py-4">{user?.email || 'Unknown'}</td>
+                        <td className="px-6 py-4">{user?.email || 'Неизвестно'}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
                             transaction.type === 'deposit' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
@@ -1440,7 +1439,7 @@ export default function AdminPage() {
                     return (
                       <tr key={order.id} className="border-t border-[#30363d]">
                         <td className="px-6 py-4">#{order.id.slice(0, 8)}</td>
-                        <td className="px-6 py-4">{user?.email || 'Unknown'}</td>
+                        <td className="px-6 py-4">{user?.email || 'Неизвестно'}</td>
                         <td className="px-6 py-4 font-semibold text-primary">{order.total.toFixed(0)}₽</td>
                         <td className="px-6 py-4">
                           <Select 
